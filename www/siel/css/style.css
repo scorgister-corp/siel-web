@@ -1,6 +1,6 @@
 @font-face {
     font-family: Parasine;
-    src: url("/font/Parisine-Regular.woff") format("woff");
+    src: url("../font/Parisine-Regular.woff") format("woff");
 }
 
 body {
