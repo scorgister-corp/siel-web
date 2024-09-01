@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIEL</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/color.css">
+    <script lang="javascript" src="js/request.js"></script>
+</head>
+<body>
+    <div id="alert-bg" hidden></div>
+    <div id="alert-panel" hidden>
+        <h1 id="select-text"></h1>
+        <div id="panel-body">
+        </div>
+        <button id="select-btn">Select</button>
+    </div>
+    <header id="header">
+        <div class="header-text">
+            <div id="routes">
+            </div>
+            <select id="stop-selection">
+                <option>?</option>    
+            </select>
+        </div>
+        <div class="right clock"><span id="clock-text">--:--</span></div>
+    </header>
+    <div class="main">
+        <div class="time-container">
+            <div class="time-head">
+                <span>1<sup>er</sup> tramway </span> <span id="dest-min" class="time-head-dest">?</span>
+            </div>
+            <div class="time-head">
+                <span>2<sup>e</sup> tramway</span> <span id="dest-max" class="time-head-dest">?</span>
+            </div>
+        </div>
+        <div class="time-container">
+            <div class="time time-left">
+                <span id="time-min" class="time-number">?</span><span class="time-sub">min</span>
+            </div>
+            <div class="time time-right">
+                <span id="time-max" class="time-number">?</span><span class="time-sub">min</span>
+            </div>
+        </div>
+    </div>
+    <div id="other">
+
+    </div>
+    <script lang="javascript" src="js/siel.js"></script>
+</body>
+</html>
