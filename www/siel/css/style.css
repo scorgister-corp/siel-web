@@ -1,11 +1,13 @@
 @font-face {
-    font-family: Parasine;
-    src: url("../font/Parisine-Regular.woff") format("woff");
+    font-family: "Parasine-Regular";
+    src: url("/font/Parasine.woff") format("woff"),
+    url("/font/Parisine.woff2") format("woff2"),
+    url("/font/Parisine.ttf") format("truetype");
 }
 
 body {
     margin: 0px;
-    font-family: Parisine;
+    font-family: "Parasine-Regular";
     background-color: white;
 }
 
