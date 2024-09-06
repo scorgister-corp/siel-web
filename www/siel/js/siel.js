@@ -2,6 +2,7 @@ var semiCol = false;
 
 var stopName = "";
 var destinations = [];
+var lines = [];
 
 function updateClock() {
     var date = new Date();
@@ -24,14 +25,14 @@ function updateClock() {
 }
 
 function updateInfos() {
-    getInfos(stopName, destinations);
+    getInfos(stopName, destinations, lines);
 }
 
-function getInfos(stopName, direction) {
-    if(stopName == undefined || direction.length == 0)
+function getInfos(stopName, direction, line) {
+    if(stopName == undefined || direction.length == 0 || lines.length == 0)
         return;
 
-    sendPost("/data", {stop_name: stopName, direction: direction}, (success, result) => {
+    sendPost("/data", {stop_name: stopName, direction: direction, line: line}, (success, result) => {
         if(result != null && result.length <= 0) {
             console.log("Error [0]");
             return;
@@ -61,39 +62,27 @@ function getInfos(stopName, direction) {
         }
 
         load(1);
-
-        document.getElementById("dest-min").innerText = destinationMin + " (" + nameMin + ")";
+            document.getElementById("dest-min").innerText = destinationMin + (lines.length>1?(" (" + nameMin + ")"):"");
         
-        var timeMin = result[0]["departure_time"].split(":");
+        var timeMin = result[0]["departure_time"] + "000";
         var timeMax = undefined;
 
-        var tMin = new Date();
-        if(timeMin[0] < tMin.getHours())
-            tMin.setDate(tMin.getDate() + 1);
-        tMin.setHours(timeMin[0]);
-        tMin.setMinutes(timeMin[1]);
-        tMin.setSeconds(timeMin[2]);
-
+        var tMin = new Date(Number(timeMin));
+        
         var diffMin = dateDiff(new Date(), tMin);
         if(diffMin.hour > 0)
             document.getElementById("time-min").innerText = "+60";
         else
             document.getElementById("time-min").innerText = diffMin.min;
         
-        var tMax = new Date();
         if(result.length > 1) {
             var destinationMax = result[1]["trip_headsign"];
             var nameMax = result[1]["route_short_name"];
-
-            document.getElementById("dest-max").innerText = destinationMax + " (" + nameMax + ")";
-
-            timeMax = result[1]["departure_time"].split(":");
             
-            if(timeMin[0] < tMax.getHours())
-                tMax.setDate(tMax.getDate() + 1);
-            tMax.setHours(timeMax[0]);
-            tMax.setMinutes(timeMax[1]);
-            tMax.setSeconds(timeMax[2]);
+            document.getElementById("dest-max").innerText = destinationMax + (lines.length>1?(" (" + nameMax + ")"):"");
+            
+            timeMax = result[1]["departure_time"] + "000";
+            var tMax = new Date(Number(timeMax));
 
             var diffMax = dateDiff(new Date(), tMax);
             if(diffMax.hour > 0)
@@ -130,15 +119,10 @@ function getInfos(stopName, direction) {
             divLeft.appendChild(divNum);
             divLeft.appendChild(destinationSpan);
 
-            var time = result[i]["departure_time"].split(":");
+            var time = result[i]["departure_time"] + "000";
 
-            var t = new Date();
-            if(time[0] < t.getHours())
-                t.setDate(tMin.getDate() + 1);
-            t.setHours(time[0]);
-            t.setMinutes(time[1]);
-            t.setSeconds(time[2]);
-    
+            var t = new Date(Number(time));
+
             var diff = dateDiff(new Date(), t);
 
             var spanTime = document.createElement("span");
@@ -216,8 +200,42 @@ function loadAlertPanel(e) {
 
             document.getElementById("panel-body").appendChild(div);
         });
-        document.getElementById("alert-panel").hidden = false;
-        document.getElementById("alert-bg").hidden = false;
+
+        sendPost("/lines", {stop_name: stopName}, (success, result) => {
+            document.getElementById("line-body").innerText = "";
+            document.getElementById("line-text-head").innerText = "Using the line(s)";
+    
+            if(e == null)
+                lines = [];
+            
+            result.forEach(element => {
+                var div = document.createElement("div");
+                div.setAttribute("class", "panel-elt");
+    
+                var inp = document.createElement("input");
+                inp.setAttribute("type", "checkbox");
+                inp.setAttribute("name", element);
+                inp.setAttribute("value", element);
+                inp.id = element;
+    
+                if(e != null && lines.includes(element))
+                    inp.checked = true;
+    
+                var lab = document.createElement("label");
+                lab.setAttribute("for", element);
+                lab.innerText = element;
+    
+                div.appendChild(inp);
+                div.appendChild(lab);
+    
+                document.getElementById("line-body").appendChild(div);
+            });
+
+            document.getElementById("alert-panel").hidden = false;
+            document.getElementById("alert-bg").hidden = false;
+        });
+
+        
     });
 }
 
@@ -234,6 +252,21 @@ function updateDirections(e) {
 
     if(count == 0) {
         alert("You must select at least one destination !")
+        return;    
+    }
+
+    lines = [];
+    count = 0;
+    for(var i = 0; i < document.getElementById("line-body").childElementCount; i++) {
+        var elt = document.getElementById("line-body").children[i];
+        if(elt.children[0].checked) {
+            lines.push(elt.children[0].value);
+            count++;
+        }
+    }
+
+    if(count == 0) {
+        alert("You must select at least one line !")
         return;    
     }
     
