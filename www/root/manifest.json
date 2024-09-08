@@ -1,0 +1,16 @@
+{
+    "name": "Montpellier SIEL",
+    "shrot_name": "SIEL",
+    "start_url": "/siel/",
+    "background_color": "#ffffff",
+    "theme_color": "#ffffff",
+    "display": "fullscreen",
+    "orientation": "landscape-primary",
+    "icons": [
+        {
+            "src": "/img/512x512.jpg",
+            "sizes": "512x512",
+            "type": "image/jpeg"
+        }
+    ]
+}
