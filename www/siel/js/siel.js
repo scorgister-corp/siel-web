@@ -62,7 +62,7 @@ function getInfos(stopName, direction, line) {
         }
 
         load(1);
-            document.getElementById("dest-min").innerText = destinationMin + (lines.length>1?(" (" + nameMin + ")"):"");
+        document.getElementById("dest-min").innerText = destinationMin + (lines.length>1?(" (" + nameMin + ")"):"");
         
         var timeMin = result[0]["departure_time"] + "000";
         var timeMax = undefined;
@@ -74,6 +74,9 @@ function getInfos(stopName, direction, line) {
             document.getElementById("time-min").innerText = "+60";
         else
             document.getElementById("time-min").innerText = diffMin.min;
+
+        var v1ID = result[0]["vehicle_id"];
+        document.getElementById("time-1").setAttribute("title", (v1ID==null?"no vehicle assigned":v1ID));
         
         if(result.length > 1) {
             var destinationMax = result[1]["trip_headsign"];
@@ -89,6 +92,9 @@ function getInfos(stopName, direction, line) {
                 document.getElementById("time-max").innerText = "+60";
             else
                 document.getElementById("time-max").innerText = diffMax.min;
+
+            var v2ID = result[1]["vehicle_id"];
+            document.getElementById("time-2").setAttribute("title", (v2ID==null?"no vehicle assigned":v2ID));
         }else {
             document.getElementById("time-max").innerText = "+60";
         }
@@ -136,6 +142,14 @@ function getInfos(stopName, direction, line) {
             mainDiv.appendChild(divLeft);
             mainDiv.appendChild(spanTime);
 
+            try {
+
+            var vID = result[i]["vehicle_id"];
+            mainDiv.setAttribute("title", (vID==null?"no vehicle assigned":vID));
+            }catch(e) {
+                console.log(e);
+                
+            }
             document.getElementById("other").appendChild(mainDiv);
 
         }
