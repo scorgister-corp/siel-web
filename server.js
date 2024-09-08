@@ -49,6 +49,8 @@ class WWWHandler extends Handler {
         if(endPoint == "")
             endPoint = "index.html";
 
+        endPoint = decodeURI(endPoint);
+            
         endPoint = endPoint.split("?")[0];
     
         try {

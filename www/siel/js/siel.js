@@ -4,6 +4,11 @@ var stopName = "";
 var destinations = [];
 var lines = [];
 
+const AUDIO_URL = "/sound/";
+const AUDIO_FORMAT = ".m4a";
+
+var audioHistory = [];
+
 function updateClock() {
     var date = new Date();
     var hours = date.getHours();
@@ -143,16 +148,47 @@ function getInfos(stopName, direction, line) {
             mainDiv.appendChild(spanTime);
 
             try {
-
-            var vID = result[i]["vehicle_id"];
-            mainDiv.setAttribute("title", (vID==null?"no vehicle assigned":vID));
+                var vID = result[i]["vehicle_id"];
+                mainDiv.setAttribute("title", (vID==null?"no vehicle assigned":vID));
             }catch(e) {
-                console.log(e);
-                
+                console.log(e);  
             }
             document.getElementById("other").appendChild(mainDiv);
-
         }
+
+        clearAudioHistory();
+
+        if(audioHistory.includes(result[0].trip_id))
+            return;
+
+        var next = undefined;
+        for(var i = 1; i < result.length; i++) {
+            if(result[i].trip_headsign == destinationMin) {
+                next = result[i];
+                break;
+            }
+        }
+
+        if(diffMin.min != 2)
+            return;
+
+        var sex = "F";
+        var audio = new Audio(AUDIO_URL + "D" + sex + destinationMin + "2" + AUDIO_FORMAT);
+        audio.play();
+
+        audioHistory.push(result[0].trip_id);
+
+        if(next == undefined)
+            return;
+
+        diff = dateDiff(new Date(), new Date(Number(next.departure_time + "000")));
+        if(diff.day > 0 || diff.hour > 0)
+            return;
+
+        setTimeout(() => {
+            var audio = new Audio(AUDIO_URL + "N" + sex + diff.min + AUDIO_FORMAT);
+            audio.play();
+        }, 4000);
         
     });
 }
@@ -181,6 +217,7 @@ function changeStation(e) {
 
 function updateStation(stop_name) {
     stopName = stop_name;
+    audioHistory = [];
     loadAlertPanel();
 }
 
@@ -320,14 +357,19 @@ function load(type) {
     });
 }
 
+function clearAudioHistory() {
+    if(audioHistory.length < 10)
+        return;
+
+    audioHistory.splice(0, audioHistory.length - 2);
+}
+
 load(0);
 
 document.getElementById("stop-selection").onchange = changeStation;
 document.getElementById("select-btn").onclick = updateDirections;
 document.getElementById("routes").onclick = loadAlertPanel
 updateClock();
-//updateStation("Charles de Gaulle");
 
 setInterval(updateClock, 500);
 setInterval(updateInfos, 10000);
-
