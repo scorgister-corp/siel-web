@@ -4,6 +4,13 @@ var stopName = "";
 var destinations = [];
 var lines = [];
 
+var alerts = [];
+
+var displayAlert = []
+var displayAlertIndex = 0;
+
+var freezAlert = false;
+
 const AUDIO_URL = "/sound/";
 const AUDIO_FORMAT = ".m4a";
 
@@ -27,6 +34,91 @@ function updateClock() {
 
     semiCol = !semiCol;
 
+}
+
+function getAlert() {
+    if(lines.length == 0) {
+        document.getElementById("marquee-rtl").hidden = true;
+        return;
+    }
+
+    sendPost("/alert", {line: lines}, (success, result) => {
+        if(!success) {
+            console.log("Error [-1]");
+            return;
+        }
+
+        if(result.length <= 1) {
+            alerts = [];
+            return;
+        }
+
+        alerts = [];
+        result.forEach(elt => {
+            alerts.push(elt);
+        });
+
+        updateAlert();
+    });
+}
+
+function updateAlert() {
+    if(alerts.length == 0) {
+        displayAlert = [];
+        return;
+    }
+
+    if(displayAlert > 2)
+        return;
+
+    var st = false;
+    if(displayAlert.length == 0)
+        st = true;
+
+    alerts.forEach(elt => {
+        var text = "Ligne " + elt.routeId + ": " + elt.text;
+        var duration = text.length * 15 / 80;
+
+        displayAlert.push(
+            {
+                text: text,
+                duration: duration
+            }
+        );
+    });
+
+    if(st)
+        setAlert();
+}
+
+function setAlert() {
+    var p = document.getElementById("marquee-rtl");
+
+    if(displayAlert.length <= 0) {
+       p.hidden = true;
+       return;
+    }else
+        p.hidden = false;
+
+    var alert = displayAlert[0];
+    
+    var div = document.createElement("div");
+    div.setAttribute("style", `animation-duration: ${alert.duration}s;`);
+    div.onanimationiteration = e => {
+        setAlert();
+    }
+
+    div.innerText = alert.text;
+
+   p.innerText = "";
+   p.appendChild(div);
+
+    if(displayAlert.length > 1 || alerts.length == 0)
+        displayAlert.splice(0, 1);
+}
+
+function updateStatusAlert(upt) {
+    isUpdateDisplay = upt;
 }
 
 function updateInfos() {
@@ -63,7 +155,7 @@ function getInfos(stopName, direction, line) {
         });
 
         if(routes.length > 0) {
-            document.getElementById("header").setAttribute("class", "header-" + routes[0])
+            document.getElementById("header").setAttribute("class", "header-" + routes[0]);
         }
 
         load(1);
@@ -218,6 +310,9 @@ function changeStation(e) {
 function updateStation(stop_name) {
     stopName = stop_name;
     audioHistory = [];
+    displayAlert = [];
+    alerts = [];
+    document.getElementById("marquee-rtl").hidden = true;
     loadAlertPanel();
 }
 
@@ -324,6 +419,7 @@ function updateDirections(e) {
     document.getElementById("alert-panel").hidden = true;
     document.getElementById("alert-bg").hidden = true;
     updateInfos();
+    getAlert();
 }
 
 function load(type) {
@@ -369,7 +465,11 @@ load(0);
 document.getElementById("stop-selection").onchange = changeStation;
 document.getElementById("select-btn").onclick = updateDirections;
 document.getElementById("routes").onclick = loadAlertPanel
+
+
 updateClock();
+getAlert();
 
 setInterval(updateClock, 500);
 setInterval(updateInfos, 10000);
+setInterval(getAlert, 30000);

@@ -4,6 +4,7 @@
     --route-3-color: #c6cf00;
     --route-4-color: #562b1a;
     --route-15-color: rgb(108, 159, 19);
+    --alert-color: #ff1313;
 }
 
 .route-1 {
@@ -44,5 +45,9 @@
 
 .header-15 {
     border-color: var(--route-15-color)
+}
+
+.header-alert {
+    border-color: var(--alert-color)
 }
 
