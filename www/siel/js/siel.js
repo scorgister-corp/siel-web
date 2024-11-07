@@ -252,10 +252,10 @@ function getInfos(stopName, direction, line) {
         mainDiv.setAttribute("class", "other-container");
 
         var but = document.createElement("button");
-        if(getCookie("favorites") == null || getCookie("favorites").includes(":" + stopName + ":"))
-            but.innerText = "Remove " + stopName + " of favorites";
-        else
+        if(getCookie("favorites") == null || !getCookie("favorites").includes(":" + stopName + ":"))
             but.innerText = "Add " + stopName + " as favorites";
+        else
+            but.innerText = "Remove " + stopName + " of favorites";
         but.value = stopName;
         but.onclick = favAction;
         but.setAttribute("class", "fav-btn")
@@ -504,9 +504,10 @@ function clearAudioHistory() {
 }
 
 function favAction(e) {
-    if(getCookie("favorites") == null)
+    if(getCookie("favorites") == null) {
         setCookie("favorites", ":" + e.target.value + ":", 100000);
-    else if(!getCookie("favorites").includes(":" + e.target.value + ":")) {
+        e.target.innerText = "Remove " + e.target.value + " of favorites"
+    }else if(!getCookie("favorites").includes(":" + e.target.value + ":")) {
         setCookie("favorites", getCookie("favorites") + e.target.value + ":");
         e.target.innerText = "Remove " + e.target.value + " of favorites"
     }else {
