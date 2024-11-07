@@ -258,6 +258,7 @@ function getInfos(stopName, direction, line) {
             but.innerText = "Add " + stopName + " as favorites";
         but.value = stopName;
         but.onclick = favAction;
+        but.setAttribute("class", "fav-btn")
         mainDiv.appendChild(but)
 
         document.getElementById("other").appendChild(mainDiv);

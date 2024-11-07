@@ -346,6 +346,13 @@ header {
     }
 }
 
+.fav-btn {
+    font-size: 50px;
+    margin-bottom: 20px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 @media (max-width: 1000px) {
     .time {
         font-size: 100px;
@@ -405,6 +412,10 @@ header {
         height: 100%;
         width: 100%;
         z-index: 100;
+    }
+
+    .fav-btn {
+        font-size: 25px;
     }
 
 }
