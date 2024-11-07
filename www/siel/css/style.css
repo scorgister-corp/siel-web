@@ -345,3 +345,54 @@ header {
       transform: translate3d(-100%,0,0);  /* position finale à gauche */
     }
 }
+
+@media (max-width: 1000px) {
+    .time {
+        font-size: 100px;
+    }
+
+    .time-sub {
+        font-size: 25px;
+    }
+
+    .time-head {
+        font-size: 25px;
+    }
+
+    .time-head-dest {
+        font-size: 20px;
+    }
+
+    .time-right {
+        border-left-width: 2px;
+    }
+
+    .time-left {
+        border-right-width: 2px;
+    }
+
+    #stop-selection {
+        display: block;
+        font-size: 100%;
+    }
+
+    .route-name {
+        font-size: 30px;
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+
+    #clock-text {
+        font-size: 25px;
+    }
+    .other-container {
+        margin-left: 0px;
+        margin-right: 0px;
+        font-size: 25px;
+        padding-bottom: 10px;
+    }
+
+    .sub-count {
+        font-size: 25px;
+    }
+}
