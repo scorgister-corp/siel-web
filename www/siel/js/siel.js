@@ -248,6 +248,20 @@ function getInfos(stopName, direction, line) {
             document.getElementById("other").appendChild(mainDiv);
         }
 
+        var mainDiv = document.createElement("div");
+        mainDiv.setAttribute("class", "other-container");
+
+        var but = document.createElement("button");
+        if(getCookie("favorites") == null || getCookie("favorites").includes(":" + stopName + ":"))
+            but.innerText = "Remove " + stopName + " of favorites";
+        else
+            but.innerText = "Add " + stopName + " as favorites";
+        but.value = stopName;
+        but.onclick = favAction;
+        mainDiv.appendChild(but)
+
+        document.getElementById("other").appendChild(mainDiv);
+
         clearAudioHistory();
 
         if(audioHistory.includes(result[0].trip_id))
@@ -438,6 +452,34 @@ function load(type) {
             document.getElementById("stop-selection").appendChild(defOpt);
         }
 
+        var fav = getCookie("favorites");
+        if(fav != null) {
+            var favs = fav.split(":");
+            var ok = false;
+
+            var opt = document.createElement("option");
+            opt.disabled = "true";
+            opt.innerText = "----";
+            document.getElementById("stop-selection").appendChild(opt);
+            
+            for(var i = 0; i < favs.length; i++) {
+                if(favs[i] == "")
+                    continue;
+                var opt = document.createElement("option");
+                opt.innerText = favs[i].toUpperCase();
+                opt.value = favs[i];
+    
+                document.getElementById("stop-selection").appendChild(opt);
+                ok = true;
+            }
+            if(ok) {
+                var opt = document.createElement("option");
+                opt.disabled = "true";
+                opt.innerText = "----";
+                document.getElementById("stop-selection").appendChild(opt);
+            }
+        }
+
         for(var i = 0; i < res.length; i++) {
             var opt = document.createElement("option");
             opt.innerText = res[i];
@@ -460,11 +502,25 @@ function clearAudioHistory() {
     audioHistory.splice(0, audioHistory.length - 2);
 }
 
+function favAction(e) {
+    if(getCookie("favorites") == null)
+        setCookie("favorites", ":" + e.target.value + ":", 100000);
+    else if(!getCookie("favorites").includes(":" + e.target.value + ":")) {
+        setCookie("favorites", getCookie("favorites") + e.target.value + ":");
+        e.target.innerText = "Remove " + e.target.value + " of favorites"
+    }else {
+        e.target.innerText = "Add " + e.target.value + " as favorites"
+        var c = getCookie("favorites");
+        c = c.substring(0, c.indexOf(":" + e.target.value + ":")) + c.substring(c.indexOf(":" + e.target.value + ":") + e.target.value.length + 1, c.length);
+        setCookie("favorites", c, 100000);
+    }  
+}
+
 load(0);
 
 document.getElementById("stop-selection").onchange = changeStation;
 document.getElementById("select-btn").onclick = updateDirections;
-document.getElementById("routes").onclick = loadAlertPanel
+document.getElementById("routes").onclick = loadAlertPanel;
 
 
 updateClock();

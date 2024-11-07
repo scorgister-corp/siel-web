@@ -395,4 +395,16 @@ header {
     .sub-count {
         font-size: 25px;
     }
+
+    #alert-panel {
+        left: 0px;
+        top: 0px;
+        border-radius: 0px;
+        box-shadow: none;
+        padding: 0px;
+        height: 100%;
+        width: 100%;
+        z-index: 100;
+    }
+
 }
