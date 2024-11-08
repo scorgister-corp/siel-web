@@ -9,6 +9,7 @@ body {
     margin: 0px;
     font-family: "Parasine-Regular";
     background-color: white;
+    overflow-x: hidden;
 }
 
 #alert-panel {
