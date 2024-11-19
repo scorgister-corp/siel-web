@@ -1,5 +1,5 @@
-const API_HOST = "https://api.mtp.scorgister.net";
-//const API_HOST = "http://localhost:2077";
+//const API_HOST = "https://api.mtp.scorgister.net";
+const API_HOST = "http://localhost:8101";
 
 function createXMLHttpRequest(method, url) {
     var xhr = new XMLHttpRequest();

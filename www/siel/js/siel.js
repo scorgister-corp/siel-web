@@ -174,6 +174,7 @@ function getInfos(stopName, direction, line) {
 
         var v1ID = result[0]["vehicle_id"];
         document.getElementById("time-1").setAttribute("title", (v1ID==null?"no vehicle assigned":v1ID));
+        document.getElementById("time-1-link").setAttribute("href", "line.html?tripid=" + result[0]["trip_id"]);
         
         if(result.length > 1) {
             var destinationMax = result[1]["trip_headsign"];
@@ -192,6 +193,8 @@ function getInfos(stopName, direction, line) {
 
             var v2ID = result[1]["vehicle_id"];
             document.getElementById("time-2").setAttribute("title", (v2ID==null?"no vehicle assigned":v2ID));
+            document.getElementById("time-2-link").setAttribute("href", "line.html?tripid=" + result[1]["trip_id"]);
+
         }else {
             document.getElementById("time-max").innerText = "+60";
         }
@@ -199,6 +202,10 @@ function getInfos(stopName, direction, line) {
         document.getElementById("other").innerText = "";
 
         for(var i = 2; i < result.length; i++) {
+            var mainA = document.createElement("a");
+            mainA.setAttribute("href", "line.html?tripid=" + result[i]["trip_id"]);
+
+
             var mainDiv = document.createElement("div");
             mainDiv.setAttribute("class", "other-container");
 
@@ -245,7 +252,8 @@ function getInfos(stopName, direction, line) {
             }catch(e) {
                 console.log(e);  
             }
-            document.getElementById("other").appendChild(mainDiv);
+            mainA.appendChild(mainDiv);
+            document.getElementById("other").appendChild(mainA);
         }
 
         var mainDiv = document.createElement("div");
@@ -279,7 +287,7 @@ function getInfos(stopName, direction, line) {
         if(diffMin.min != 2)
             return;
 
-        var sex = "F";
+        var sex = ["F", "M"][Math.floor((Math.random()*2))];
         var audio = new Audio(AUDIO_URL + "D" + sex + destinationMin + "2" + AUDIO_FORMAT);
         audio.play();
 

@@ -1,0 +1,68 @@
+
+:root {
+    --orange-color: #f59518
+}
+
+
+#line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 10px; /* Épaisseur de la ligne */
+    position: relative;
+}
+  
+.station {
+    width: 15px; /* Taille des points */
+    height: 15px;
+    background-color: white; /* Couleur des stations */
+    border: 3px solid #000; /* Bordure noire autour */
+    border-radius: 50%; /* Rond parfait */
+    position: absolute;
+    transform: translateX(-50%); /* Décalage pour centrer */
+
+}
+
+.station-name {
+    position: absolute;
+    top: -19px; /* Distance verticale depuis le point */
+    left: 8px; /* Aligne le début du texte avec la gauche */
+    transform-origin: left top; /* Fait pivoter autour du point de départ */
+    transform: rotate(-45deg); /* Incline le texte */
+    white-space: nowrap; /* Empêche le retour à la ligne */
+    text-align: left; /* Aligne le texte à gauche */
+    color: black;
+    font-weight: bold;
+  }
+
+.approche {
+    animation: blink 1.5s infinite step-start;
+}
+
+.visited {
+    background-color: white;
+    box-shadow: none;
+
+}
+
+.not-visited-or-in-station {
+    background-color: var(--orange-color);
+    box-shadow: 0 0 30px var(--orange-color);
+}
+
+.main {
+    margin-top: 15%;
+    margin-left: 40px;
+    margin-right: 165px;
+}
+
+@keyframes blink {
+    0%, 100% {
+        background-color: white;
+        box-shadow: none;
+    }
+    50% {
+        background-color: var(--orange-color);
+        box-shadow: 0 0 30px var(--orange-color);
+    }
+}
