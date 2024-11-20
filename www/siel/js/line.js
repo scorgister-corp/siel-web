@@ -46,6 +46,7 @@ function load() {
                     stationElt.setAttribute("class", "station not-visited-or-in-station");
                     IN_STATION = true;
                     NEXT_STOP_NAME = element["station_name"];
+                    NEXT_STOP = element["departure_time"];
                     inStation = true;
                     break;
                 case 1:
@@ -74,10 +75,12 @@ function load() {
 }
 
 function updateTimer() {
+    console.log(NEXT_STOP - Math.floor(Date.now() / 1000));
+    var sec = NEXT_STOP - Math.floor(Date.now() / 1000)
     if(IN_STATION) {
-        document.getElementById("next-stop").innerText = "Stopped at " + NEXT_STOP_NAME;
+        document.getElementById("next-stop").innerText = "Stopped at " + NEXT_STOP_NAME + " (" + sec + " s)";
     }else {
-        document.getElementById("next-stop").innerText = "In transit to " + NEXT_STOP_NAME;
+        document.getElementById("next-stop").innerText = "In transit to " + NEXT_STOP_NAME + " (" + sec + " s)";
     }
 }
 
