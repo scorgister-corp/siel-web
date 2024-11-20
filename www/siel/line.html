@@ -12,10 +12,24 @@
     <script lang="javascript" src="js/request.js"></script>
 </head>
 <body>
+    <di class="head">
+        <span class="head-elt" id="line-id">? - ?</span>
+        <span class="head-elt" id="next-stop">?</span>
+        <span class="head-elt" id="vehicle-id">?</span>
+    </di>
     <div class="main">
-        <div id="line">
+        <div id="line" class="route-default">
         </div>
     </div>
+    <div class="sub-div">
+        <span id="terminated" hidden>Trip Terminated</span>
+    </div>
+    <div style="margin: 40px;">
+        <button id="arrived">Arrived</button>
+        <button id="departure">Departure</button>
+        <button id="send">SEND</button>
+    </div>
     <script lang="javascript" src="js/line.js"></script>
+    <script lang="javascript" src="js/export.js"></script>
 </body>
 </html>

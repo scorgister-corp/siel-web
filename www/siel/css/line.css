@@ -8,8 +8,19 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    margin-right: 125px;
     height: 10px; /* Épaisseur de la ligne */
     position: relative;
+}
+
+.route-default {
+    background-color: black;
+}
+
+#terminated {
+    text-align: center;
+    margin: auto;
+    font-size: 70px;
 }
   
 .station {
@@ -20,6 +31,7 @@
     border-radius: 50%; /* Rond parfait */
     position: absolute;
     transform: translateX(-50%); /* Décalage pour centrer */
+    left: var(--ratio);
 
 }
 
@@ -51,9 +63,38 @@
 }
 
 .main {
-    margin-top: 15%;
+    margin-top: 20%;
     margin-left: 40px;
-    margin-right: 165px;
+    margin-right: 40px;
+    color: black;
+    background-color: white;
+}
+
+.sub-div {
+    display: flex;
+}
+
+.head {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+.head-elt {
+    margin: auto;
+}
+
+#line-id {
+    font-size: 60px;
+}
+
+#vehicle-id {
+    font-size: 40px;
+}
+
+#next-stop {
+    font-size: 50px;
 }
 
 @keyframes blink {
@@ -65,4 +106,43 @@
         background-color: var(--orange-color);
         box-shadow: 0 0 30px var(--orange-color);
     }
+}
+
+@media (max-width: 1000px) {
+
+    #line-id {
+        font-size: 30px;
+    }
+    
+    #vehicle-id {
+        font-size: 25px;
+    }
+    
+    #next-stop {
+        font-size: 20px;
+    }
+
+    #line {
+        flex-direction: column;
+        width: 10px;
+        height: 150vh;
+        margin-bottom: 40px;
+    }
+
+    .head {
+        margin-top: 10px;
+    }
+
+    .station {
+        top: var(--ratio);
+        transform: translateY(-50%) translateX(0%);
+        left: -50%;
+    }
+
+    .station-name {
+        transform: rotate(0deg); /* Incline le texte */
+        top: -3px; /* Distance verticale depuis le point */
+        left: 20px;
+    }
+
 }
