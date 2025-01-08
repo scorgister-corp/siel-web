@@ -1,4 +1,4 @@
-const API_HOST = "http://api.mtp.scorgister.net";
+const API_HOST = "https://api.mtp.scorgister.net";
 //const API_HOST = "http://localhost:8000";
 
 function sendPost(url, body, response = function() {}) {
