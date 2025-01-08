@@ -1,79 +1,22 @@
-const API_HOST = "https://api.mtp.scorgister.net";
-//const API_HOST = "http://localhost:8101";
-
-function createXMLHttpRequest(method, url) {
-    var xhr = new XMLHttpRequest();
-    xhr.open(method, url, true);
-
-    return xhr;
-}
+const API_HOST = "http://api.mtp.scorgister.net";
+//const API_HOST = "http://localhost:8000";
 
 function sendPost(url, body, response = function() {}) {
-    var xhr = createXMLHttpRequest("POST", API_HOST + url);
-    xhr.setRequestHeader("Content-Type", "application/json");
-    xhr.setRequestHeader("Cookies", document.cookie);
-
-    token = getCookie("token");
-
-    if(token != null && token != undefined && token != "")
-        xhr.setRequestHeader("X-Application-Auth", token)
-
-    xhr.overrideMimeType('application/json; charset=utf-8');
-
-    xhr.onreadystatechange = function() {
-        result(xhr, response);
-    };
-
-    body = JSON.stringify(body);
-    
-    xhr.send(body);
+    fetch(API_HOST + url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body)
+    }).then(response => response.json())
+    .then(data => response(true, data));
 }
 
 function sendGet(url, response = function() {}) {
-    var xhr = createXMLHttpRequest("GET", API_HOST + url);
-    xhr.setRequestHeader("Content-Type", "application/json");
-    xhr.setRequestHeader("Cookies", document.cookie);
-
-    token = getCookie("token");
-
-    if(token != null && token != undefined && token != "")
-        xhr.setRequestHeader("X-Application-Auth", token)
-
-    xhr.overrideMimeType('application/json; charset=utf-8');
-    
-    xhr.onreadystatechange = function() {
-        result(xhr, response);
-    };
-
-    xhr.send();
-}
-
-/*
-function sendPostFormData(url, formData, response = function() {}) {
-    var xhr = createXMLHttpRequest("POST", "https://api.taskflow.scorgister.net" + url);
-    xhr.withCredentials = true;
-    xhr.setRequestHeader("Cookies", document.cookie);
-
-    xhr.onreadystatechange = function() {
-        result(xhr, response);
-    };
-    xhr.send(formData);
-}
-*/
-function result(xhr, response) {
-    if(xhr.readyState === 4) {
-        try {
-            var obj = JSON.parse(xhr.response);
-            try {
-                if(obj != null)
-                    response(true, obj);
-                else
-                    response(false, xhr.response);
-            }catch(e) {}
-        }catch(e) {
-            response(false, xhr.response);
-        }
-    }
+    fetch(API_HOST + url, {
+        method: 'GET'
+    }).then(response => response.json())
+    .then(data => response(true, data));
 }
 
 function getCookie(cname) {
