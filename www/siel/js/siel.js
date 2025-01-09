@@ -16,25 +16,7 @@ const AUDIO_FORMAT = ".m4a";
 
 var audioHistory = [];
 
-function updateClock() {
-    var date = new Date();
-    var hours = date.getHours();
-    var min = date.getMinutes();
-    
-    if(hours.toString().length == 1)
-        hours = "0" + hours;
 
-    if(min.toString().length == 1)
-        min = "0" + min;
-
-    if(semiCol)
-        document.getElementById("clock-text").innerText = hours + " " + min;
-    else
-        document.getElementById("clock-text").innerText = hours + ":" + min;
-
-    semiCol = !semiCol;
-
-}
 
 function getAlert() {
     if(lines.length == 0) {
@@ -122,10 +104,10 @@ function updateStatusAlert(upt) {
 }
 
 function updateInfos() {
-    getInfos(stopName, destinations, lines);
+    getInfos(stopName, destinations, lines, 1);
 }
 
-function getInfos(stopName, direction, line) {
+function getInfos(stopName, direction, line, type) {
     if(stopName == undefined || direction.length == 0 || lines.length == 0)
         return;
 
@@ -144,21 +126,23 @@ function getInfos(stopName, direction, line) {
                 routes.push(element["route_short_name"]);
         });
 
-        document.getElementById("routes").innerText = "";
-        routes.forEach(element => {
-            var spanRoute = document.createElement("span");
-            spanRoute.setAttribute("class", "route-name route-" + element)
-            spanRoute.innerText = element;
+        if(document.getElementById("routes") != undefined) {
+            document.getElementById("routes").innerText = "";
+            routes.forEach(element => {
+                var spanRoute = document.createElement("span");
+                spanRoute.setAttribute("class", "route-name route-" + element)
+                spanRoute.innerText = element;
 
-            
-            document.getElementById("routes").appendChild(spanRoute);
-        });
+                
+                document.getElementById("routes").appendChild(spanRoute);
+            });
 
-        if(routes.length > 0) {
-            document.getElementById("header").setAttribute("class", "header-" + routes[0]);
+            if(routes.length > 0) {
+                document.getElementById("header").setAttribute("class", "header-" + routes[0]);
+            }
+
+            load(type);
         }
-
-        load(1);
         document.getElementById("dest-min").innerText = destinationMin + (lines.length>1?(" (" + nameMin + ")"):"");
         
         var timeMin = result[0]["departure_time"] + "000";
@@ -199,77 +183,79 @@ function getInfos(stopName, direction, line) {
             document.getElementById("time-max").innerText = "+60";
         }
 
-        document.getElementById("other").innerText = "";
+        if(document.getElementById("other") != undefined) {
+            document.getElementById("other").innerText = "";
 
-        for(var i = 2; i < result.length; i++) {
-            var mainA = document.createElement("a");
-            mainA.setAttribute("href", "line.html?tripid=" + result[i]["trip_id"]);
+            for(var i = 2; i < result.length; i++) {
+                var mainA = document.createElement("a");
+                mainA.setAttribute("href", "line.html?tripid=" + result[i]["trip_id"]);
 
+
+                var mainDiv = document.createElement("div");
+                mainDiv.setAttribute("class", "other-container");
+
+                var divLeft = document.createElement("div");
+                var divNum = document.createElement("div");
+                divNum.setAttribute("class", "sub-count")
+
+                var numSpan = document.createElement("span");
+                numSpan.innerText = i+1;
+
+                var e = document.createElement("sup");
+                e.innerText = "e";
+
+                var destinationSpan = document.createElement("span");
+                destinationSpan.innerText = result[i]["trip_headsign"];
+
+                numSpan.appendChild(e);
+                numSpan.innerHTML += " ";
+
+                divNum.appendChild(numSpan);
+                divLeft.appendChild(divNum);
+                divLeft.appendChild(destinationSpan);
+
+                var time = result[i]["departure_time"] + "000";
+
+                var t = new Date(Number(time));
+
+                var diff = dateDiff(new Date(), t);
+
+                var spanTime = document.createElement("span");
+                if(diff.hour > 0) {
+                    if(diff.min.toString().length == 1)
+                        diff.min = "0" + diff.min
+                    spanTime.innerHTML = diff.hour + "<sub>h</sub>" + diff.min;
+                }else {
+                    spanTime.innerHTML = diff.min + "<sub>min</sub>";
+                }
+                mainDiv.appendChild(divLeft);
+                mainDiv.appendChild(spanTime);
+
+                try {
+                    var vID = result[i]["vehicle_id"];
+                    mainDiv.setAttribute("title", (vID==null?"no vehicle assigned":vID));
+                }catch(e) {
+                    console.log(e);  
+                }
+                mainA.appendChild(mainDiv);
+                document.getElementById("other").appendChild(mainA);
+            }
 
             var mainDiv = document.createElement("div");
             mainDiv.setAttribute("class", "other-container");
 
-            var divLeft = document.createElement("div");
-            var divNum = document.createElement("div");
-            divNum.setAttribute("class", "sub-count")
+            var but = document.createElement("button");
+            if(getCookie("favorites") == null || !getCookie("favorites").includes(":" + stopName + ":"))
+                but.innerText = "Add " + stopName + " as favorites";
+            else
+                but.innerText = "Remove " + stopName + " of favorites";
+            but.value = stopName;
+            but.onclick = favAction;
+            but.setAttribute("class", "fav-btn")
+            mainDiv.appendChild(but)
 
-            var numSpan = document.createElement("span");
-            numSpan.innerText = i+1;
-
-            var e = document.createElement("sup");
-            e.innerText = "e";
-
-            var destinationSpan = document.createElement("span");
-            destinationSpan.innerText = result[i]["trip_headsign"];
-
-            numSpan.appendChild(e);
-            numSpan.innerHTML += " ";
-
-            divNum.appendChild(numSpan);
-            divLeft.appendChild(divNum);
-            divLeft.appendChild(destinationSpan);
-
-            var time = result[i]["departure_time"] + "000";
-
-            var t = new Date(Number(time));
-
-            var diff = dateDiff(new Date(), t);
-
-            var spanTime = document.createElement("span");
-            if(diff.hour > 0) {
-                if(diff.min.toString().length == 1)
-                    diff.min = "0" + diff.min
-                spanTime.innerHTML = diff.hour + "<sub>h</sub>" + diff.min;
-            }else {
-                spanTime.innerHTML = diff.min + "<sub>min</sub>";
-            }
-            mainDiv.appendChild(divLeft);
-            mainDiv.appendChild(spanTime);
-
-            try {
-                var vID = result[i]["vehicle_id"];
-                mainDiv.setAttribute("title", (vID==null?"no vehicle assigned":vID));
-            }catch(e) {
-                console.log(e);  
-            }
-            mainA.appendChild(mainDiv);
-            document.getElementById("other").appendChild(mainA);
+            document.getElementById("other").appendChild(mainDiv);
         }
-
-        var mainDiv = document.createElement("div");
-        mainDiv.setAttribute("class", "other-container");
-
-        var but = document.createElement("button");
-        if(getCookie("favorites") == null || !getCookie("favorites").includes(":" + stopName + ":"))
-            but.innerText = "Add " + stopName + " as favorites";
-        else
-            but.innerText = "Remove " + stopName + " of favorites";
-        but.value = stopName;
-        but.onclick = favAction;
-        but.setAttribute("class", "fav-btn")
-        mainDiv.appendChild(but)
-
-        document.getElementById("other").appendChild(mainDiv);
 
         clearAudioHistory();
 
@@ -446,6 +432,9 @@ function updateDirections(e) {
 }
 
 function load(type) {
+    if(type == 2)
+        return;
+
     sendGet("/stops", (success, res) => {
         if(res == null || res.length <= 0) {
             console.log("Error [1]");
@@ -526,16 +515,7 @@ function favAction(e) {
     }  
 }
 
-load(0);
 
-document.getElementById("stop-selection").onchange = changeStation;
-document.getElementById("select-btn").onclick = updateDirections;
-document.getElementById("routes").onclick = loadAlertPanel;
-
-
-updateClock();
 getAlert();
 
-setInterval(updateClock, 500);
-setInterval(updateInfos, 10000);
 setInterval(getAlert, 30000);
