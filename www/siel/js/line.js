@@ -24,6 +24,7 @@ function load() {
 
             document.getElementById("line-id").innerText = result[0]["station_name"] + " - " + result[result.length-1]["station_name"];
             document.getElementById("vehicle-id").innerText = result[0]["vehicle_id"];
+            document.getElementById("vehicle-id-link").setAttribute("href", "info.html?vehiculeid=" + result[0]["vehicle_id"]);
         }else {
             document.getElementById("line-id").style = "display: None;";
             document.getElementById("next-stop").style = "display: None;";

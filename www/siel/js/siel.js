@@ -278,7 +278,6 @@ function getInfos(stopName, direction, line, type) {
         audio.play();
 
         audioHistory.push(result[0].trip_id);
-
         if(next == undefined)
             return;
 
