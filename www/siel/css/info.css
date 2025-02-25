@@ -134,3 +134,67 @@ a.trip-title {
 .trip-station {
     color: #f0d800;
 }
+
+@media (max-width: 1000px) {
+
+    .main-container {
+        margin-left: 0px;
+        margin-right: 0px;
+        border: unset;
+        border-radius: 0px;
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+
+    .table-info {
+        border-radius: 0px;
+    }
+
+    .info-title {
+        font-size: 15px;
+        white-space: wrap;
+
+        padding: 10px;
+    }
+
+    .info-data {
+        font-size: 17px;
+    }
+
+    h2 {
+        margin-left: 10px;
+    }
+    
+    .comp-container {
+        width: calc(100% - 30px);
+        padding-top: 30px;
+        padding-bottom: 30px;
+        padding-right: 15px;
+        padding-left: 15px;
+    }
+
+    .trip-title {
+        font-size: 25px;
+        margin-left: 5px;
+        margin-right: 5px;
+
+    }
+
+    .trip-data {
+        margin-left: 10px;
+        margin-right: 10px;
+    }
+
+    .trip-bold {
+        font-size: 22px;
+    }
+
+    .trip-station {
+        font-size: 20px;
+    }
+
+    .info-title {
+        padding-left: 20px;
+
+    }
+}
