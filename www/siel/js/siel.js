@@ -273,8 +273,8 @@ function getInfos(stopName, direction, line, type) {
         if(diffMin.min != 2)
             return;
 
-        var sex = ["F", "M"][Math.floor((Math.random()*2))];
-        var audio = new Audio(AUDIO_URL + "D" + sex + destinationMin + "2" + AUDIO_FORMAT);
+        var gender = ["F", "M"][Math.floor((Math.random()*2))];
+        var audio = new Audio(AUDIO_URL + "D" + gender + destinationMin + "2" + AUDIO_FORMAT);
         audio.play();
 
         audioHistory.push(result[0].trip_id);
@@ -286,7 +286,7 @@ function getInfos(stopName, direction, line, type) {
             return;
 
         setTimeout(() => {
-            var audio = new Audio(AUDIO_URL + "N" + sex + diff.min + AUDIO_FORMAT);
+            var audio = new Audio(AUDIO_URL + "N" + gender + diff.min + AUDIO_FORMAT);
             audio.play();
         }, 4000);
         
@@ -334,22 +334,17 @@ function loadAlertPanel(e) {
         
         result.forEach(element => {
             var div = document.createElement("div");
-            div.setAttribute("class", "panel-elt");
-
-            var inp = document.createElement("input");
-            inp.setAttribute("type", "checkbox");
-            inp.setAttribute("name", element);
-            inp.setAttribute("value", element);
-            inp.id = element;
+            div.setAttribute("class", "panel-elt dest-0");
+            div.setAttribute("id", element);
+            div.setAttribute("value", element);
+            div.onclick = onclickDest;
 
             if(e != null && destinations.includes(element))
-                inp.checked = true;
-
-            var lab = document.createElement("label");
-            lab.setAttribute("for", element);
+                div.setAttribute("class", "panel-elt dest-1");
+            
+            var lab = document.createElement("span");
             lab.innerText = element;
 
-            div.appendChild(inp);
             div.appendChild(lab);
 
             document.getElementById("panel-body").appendChild(div);
@@ -364,22 +359,17 @@ function loadAlertPanel(e) {
             
             result.forEach(element => {
                 var div = document.createElement("div");
-                div.setAttribute("class", "panel-elt");
-    
-                var inp = document.createElement("input");
-                inp.setAttribute("type", "checkbox");
-                inp.setAttribute("name", element);
-                inp.setAttribute("value", element);
-                inp.id = element;
-    
+                div.setAttribute("class", "panel-elt dest-0");
+                div.setAttribute("id", element);
+                div.setAttribute("value", element);
+                div.onclick = onclickDest;
+
                 if(e != null && lines.includes(element))
-                    inp.checked = true;
+                    div.setAttribute("class", "panel-elt dest-1");
     
-                var lab = document.createElement("label");
-                lab.setAttribute("for", element);
+                var lab = document.createElement("span");
                 lab.innerText = element;
     
-                div.appendChild(inp);
                 div.appendChild(lab);
     
                 document.getElementById("line-body").appendChild(div);
@@ -387,10 +377,22 @@ function loadAlertPanel(e) {
 
             document.getElementById("alert-panel").hidden = false;
             document.getElementById("alert-bg").hidden = false;
-        });
-
-        
+        }); 
     });
+}
+
+function onclickDest(e) {
+    var d = e.target;
+    if(d.id == "") {
+        d = d.parentElement;
+    }
+
+    if(d.getAttribute("class").includes("dest-0"))
+        d.setAttribute("class", "panel-elt dest-1");
+    else
+        d.setAttribute("class", "panel-elt dest-0");
+
+    
 }
 
 function updateDirections(e) {
@@ -398,8 +400,9 @@ function updateDirections(e) {
     var count = 0;
     for(var i = 0; i < document.getElementById("panel-body").childElementCount; i++) {
         var elt = document.getElementById("panel-body").children[i];
-        if(elt.children[0].checked) {
-            destinations.push(elt.children[0].value);
+        
+        if(elt.getAttribute("class").includes("dest-1")) {
+            destinations.push(elt.id);
             count++;
         }
     }
@@ -413,8 +416,8 @@ function updateDirections(e) {
     count = 0;
     for(var i = 0; i < document.getElementById("line-body").childElementCount; i++) {
         var elt = document.getElementById("line-body").children[i];
-        if(elt.children[0].checked) {
-            lines.push(elt.children[0].value);
+        if(elt.getAttribute("class").includes("dest-1")) {
+            lines.push(elt.id);
             count++;
         }
     }

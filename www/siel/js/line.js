@@ -20,7 +20,7 @@ function load() {
             document.getElementById("line").style = "display: flex;";
             document.getElementById("terminated").style = "display: None;";
 
-            lineElt.setAttribute("class", "route-" + result[0]["route_short_name"]);
+            lineElt.setAttribute("class", "route route-" + result[0]["route_short_name"]);
 
             document.getElementById("line-id").innerText = result[0]["station_name"] + " - " + result[result.length-1]["station_name"];
             document.getElementById("vehicle-id").innerText = result[0]["vehicle_id"];
@@ -76,7 +76,7 @@ function load() {
 }
 
 function updateTimer() {
-    console.log(NEXT_STOP - Math.floor(Date.now() / 1000));
+    //console.log(NEXT_STOP - Math.floor(Date.now() / 1000));
     var sec = NEXT_STOP - Math.floor(Date.now() / 1000)
     if(IN_STATION) {
         document.getElementById("next-stop").innerText = "Stopped at " + NEXT_STOP_NAME + " (" + sec + " s)";

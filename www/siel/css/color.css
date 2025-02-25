@@ -7,6 +7,10 @@
     --alert-color: #ff1313;
 }
 
+.route {
+    background-color: var(--route-2-color);
+}
+
 .route-1 {
     background-color: var(--route-1-color);
 }
