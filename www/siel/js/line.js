@@ -16,7 +16,7 @@ function load() {
         if(result.length > 0) {
             document.getElementById("line-id").style = "display: initial;";
             document.getElementById("next-stop").style = "display: initial;";
-            document.getElementById("vehicle-id").style = "display: initial;";
+            document.getElementById("vehicle-id").style = "display: initial; text-decoration: underline;";
             document.getElementById("line").style = "display: flex;";
             document.getElementById("terminated").style = "display: None;";
 
@@ -39,29 +39,34 @@ function load() {
         var inStation = false;
         result.forEach(element => {
             var stationElt = document.createElement("div");
-            switch(element.state) {
-                case -1:
-                    stationElt.setAttribute("class", "station visited");
-                    break;
-                case 0:
-                    stationElt.setAttribute("class", "station not-visited-or-in-station");
-                    IN_STATION = true;
-                    NEXT_STOP_NAME = element["station_name"];
-                    NEXT_STOP = element["departure_time"];
-                    inStation = true;
-                    break;
-                case 1:
-                    if(first && !inStation) {
-                        stationElt.setAttribute("class", "station approche");
-                        NEXT_STOP = element["departure_time"];
-                        NEXT_STOP_NAME = element["station_name"];
-                        IN_STATION = false;
-                        first = false;
-                    }else {
-                        stationElt.setAttribute("class", "station not-visited-or-in-station");
-                    }
-                    break;
 
+            if(element.schedule_relationship == 1) {
+                stationElt.setAttribute("class", "station visited");
+            }else {
+                switch(element.state) {
+                    case -1:
+                        stationElt.setAttribute("class", "station visited");
+                        break;
+                    case 0:
+                        stationElt.setAttribute("class", "station not-visited-or-in-station");
+                        IN_STATION = true;
+                        NEXT_STOP_NAME = element["station_name"];
+                        NEXT_STOP = element["departure_time"];
+                        inStation = true;
+                        break;
+                    case 1:
+                        if(first && !inStation) {
+                            stationElt.setAttribute("class", "station approche");
+                            NEXT_STOP = element["departure_time"];
+                            NEXT_STOP_NAME = element["station_name"];
+                            IN_STATION = false;
+                            first = false;
+                        }else {
+                            stationElt.setAttribute("class", "station not-visited-or-in-station");
+                        }
+                        break;
+
+                }
             }
             stationElt.style = '--ratio: ' + i / (result.length - 1) * 100 + '%;';
             stationElt.setAttribute("value", element["departure_time"]);

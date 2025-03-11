@@ -4,10 +4,10 @@ var stopName = "";
 var destinations = [];
 var lines = [];
 
-var alerts = [];
+var alerts = {};
 
-var displayAlert = []
-var displayAlertIndex = 0;
+var displayAlertSchedule = [];
+var displayAlert = false;
 
 var freezAlert = false;
 
@@ -15,8 +15,6 @@ const AUDIO_URL = "/sound/";
 const AUDIO_FORMAT = ".m4a";
 
 var audioHistory = [];
-
-
 
 function getAlert() {
     if(lines.length == 0) {
@@ -30,14 +28,17 @@ function getAlert() {
             return;
         }
 
-        if(result.length <= 1) {
-            alerts = [];
-            return;
-        }
-
-        alerts = [];
+        alerts = {};
         result.forEach(elt => {
-            alerts.push(elt);
+            var text = "Ligne " + elt.routeId + ": " + elt.text;
+            var duration = text.length * 15 / 80;
+
+            alerts[elt.alert_id] = {
+                text: text,
+                duration: duration
+            };
+            if(!displayAlertSchedule.includes(elt.alert_id))
+                displayAlertSchedule.push(elt.alert_id);
         });
 
         updateAlert();
@@ -45,58 +46,43 @@ function getAlert() {
 }
 
 function updateAlert() {
-    if(alerts.length == 0) {
-        displayAlert = [];
+    if(alerts.length == 0 || displayAlertSchedule.length == 0) {
         return;
     }
-
-    if(displayAlert > 2)
-        return;
-
-    var st = false;
-    if(displayAlert.length == 0)
-        st = true;
-
-    alerts.forEach(elt => {
-        var text = "Ligne " + elt.routeId + ": " + elt.text;
-        var duration = text.length * 15 / 80;
-
-        displayAlert.push(
-            {
-                text: text,
-                duration: duration
-            }
-        );
-    });
-
-    if(st)
-        setAlert();
+    if(!displayAlert) {
+        displayAlert = true;
+        setAlert(displayAlertSchedule.pop());
+    }
 }
 
-function setAlert() {
-    var p = document.getElementById("marquee-rtl");
+function setAlert(id) {
+    let p = document.getElementById("marquee-rtl");
 
-    if(displayAlert.length <= 0) {
+    while(alerts[id] == undefined && displayAlertSchedule.length > 0)
+        id = displayAlertSchedule.pop();
+    
+    if(alerts[id] != undefined)
+        displayAlertSchedule.push(id);
+
+    if(displayAlertSchedule.length == 0) {
        p.hidden = true;
+       displayAlert = false;
        return;
     }else
         p.hidden = false;
 
-    var alert = displayAlert[0];
+    var alert = alerts[id];
     
-    var div = document.createElement("div");
+    let div = document.createElement("div");
     div.setAttribute("style", `animation-duration: ${alert.duration}s;`);
     div.onanimationiteration = e => {
-        setAlert();
+        setAlert(displayAlertSchedule.pop());
     }
 
     div.innerText = alert.text;
 
-   p.innerText = "";
-   p.appendChild(div);
-
-    if(displayAlert.length > 1 || alerts.length == 0)
-        displayAlert.splice(0, 1);
+    p.innerText = "";
+    p.appendChild(div);
 }
 
 function updateStatusAlert(upt) {
@@ -152,9 +138,9 @@ function getInfos(stopName, direction, line, type) {
         
         var diffMin = dateDiff(new Date(), tMin);
         if(diffMin.hour > 0)
-            document.getElementById("time-min").innerText = "+60";
+            document.getElementById("time-min").innerText = (result[0].theoretical?"*":"") + "+60";
         else
-            document.getElementById("time-min").innerText = diffMin.min;
+            document.getElementById("time-min").innerText = (result[0].theoretical?"*":"") + diffMin.min;
 
         var v1ID = result[0]["vehicle_id"];
         document.getElementById("time-1").setAttribute("title", (v1ID==null?"no vehicle assigned":v1ID));
@@ -171,9 +157,9 @@ function getInfos(stopName, direction, line, type) {
 
             var diffMax = dateDiff(new Date(), tMax);
             if(diffMax.hour > 0)
-                document.getElementById("time-max").innerText = "+60";
+                document.getElementById("time-max").innerText = (result[1].theoretical?"*":"") + "+60";
             else
-                document.getElementById("time-max").innerText = diffMax.min;
+                document.getElementById("time-max").innerText = (result[1].theoretical?"*":"") + diffMax.min;
 
             var v2ID = result[1]["vehicle_id"];
             document.getElementById("time-2").setAttribute("title", (v2ID==null?"no vehicle assigned":v2ID));
@@ -224,9 +210,9 @@ function getInfos(stopName, direction, line, type) {
                 if(diff.hour > 0) {
                     if(diff.min.toString().length == 1)
                         diff.min = "0" + diff.min
-                    spanTime.innerHTML = diff.hour + "<sub>h</sub>" + diff.min;
+                    spanTime.innerHTML = (result[i].theoretical?"*":"") + diff.hour + "<sub>h</sub>" + diff.min;
                 }else {
-                    spanTime.innerHTML = diff.min + "<sub>min</sub>";
+                    spanTime.innerHTML = (result[i].theoretical?"*":"") + diff.min + "<sub>min</sub>";
                 }
                 mainDiv.appendChild(divLeft);
                 mainDiv.appendChild(spanTime);
@@ -318,21 +304,21 @@ function changeStation(e) {
 function updateStation(stop_name) {
     stopName = stop_name;
     audioHistory = [];
-    displayAlert = [];
-    alerts = [];
+    displayAlert = false;
+    alerts = {};
     document.getElementById("marquee-rtl").hidden = true;
     loadAlertPanel();
 }
 
 function loadAlertPanel(e) {
-    sendPost("/directions", {stop_name: stopName}, (success, result) => {
+    sendPost("/stopdata", {stop_name: stopName}, (success, result) => {
         document.getElementById("panel-body").innerText = "";
         document.getElementById("select-text").innerText = "Select your destination(s) from: " + stopName;
 
         if(e == null)
             destinations = [];
         
-        result.forEach(element => {
+        result.directions.forEach(element => {
             var div = document.createElement("div");
             div.setAttribute("class", "panel-elt dest-0");
             div.setAttribute("id", element);
@@ -350,34 +336,32 @@ function loadAlertPanel(e) {
             document.getElementById("panel-body").appendChild(div);
         });
 
-        sendPost("/lines", {stop_name: stopName}, (success, result) => {
-            document.getElementById("line-body").innerText = "";
-            document.getElementById("line-text-head").innerText = "Using the line(s)";
+        document.getElementById("line-body").innerText = "";
+        document.getElementById("line-text-head").innerText = "Using the line(s)";
     
-            if(e == null)
-                lines = [];
-            
-            result.forEach(element => {
-                var div = document.createElement("div");
-                div.setAttribute("class", "panel-elt dest-0");
-                div.setAttribute("id", element);
-                div.setAttribute("value", element);
-                div.onclick = onclickDest;
+        if(e == null)
+            lines = [];
+        
+        result.lines.forEach(element => {
+            var div = document.createElement("div");
+            div.setAttribute("class", "panel-elt dest-0");
+            div.setAttribute("id", element);
+            div.setAttribute("value", element);
+            div.onclick = onclickDest;
 
-                if(e != null && lines.includes(element))
-                    div.setAttribute("class", "panel-elt dest-1");
-    
-                var lab = document.createElement("span");
-                lab.innerText = element;
-    
-                div.appendChild(lab);
-    
-                document.getElementById("line-body").appendChild(div);
-            });
+            if(e != null && lines.includes(element))
+                div.setAttribute("class", "panel-elt dest-1");
 
-            document.getElementById("alert-panel").hidden = false;
-            document.getElementById("alert-bg").hidden = false;
-        }); 
+            var lab = document.createElement("span");
+            lab.innerText = element;
+
+            div.appendChild(lab);
+
+            document.getElementById("line-body").appendChild(div);
+        });
+
+        document.getElementById("alert-panel").hidden = false;
+        document.getElementById("alert-bg").hidden = false;
     });
 }
 
@@ -429,8 +413,23 @@ function updateDirections(e) {
     
     document.getElementById("alert-panel").hidden = true;
     document.getElementById("alert-bg").hidden = true;
+
+    clear();
+
     updateInfos();
     getAlert();
+}
+
+function clear() {
+    document.getElementById("header").setAttribute("class", "");
+    document.getElementById("routes").innerText = "";
+
+    document.getElementById("dest-min").innerText = "?";
+    document.getElementById("dest-max").innerText = "?";
+
+    document.getElementById("time-min").innerText = "?";
+    document.getElementById("time-max").innerText = "?";
+    document.getElementById("other").innerText = "";
 }
 
 function load(type) {
