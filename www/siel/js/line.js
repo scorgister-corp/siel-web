@@ -13,7 +13,9 @@ function load() {
     sendGet("/trip?tripid=" + urlParams.get("tripid"), (success, result) => {
         var lineElt = document.getElementById("line");
         lineElt.innerHTML = "";
-        if(result.length > 0) {
+
+
+        if(result != undefined && result.length > 0 && result != null) {
             document.getElementById("line-id").style = "display: initial;";
             document.getElementById("next-stop").style = "display: initial;";
             document.getElementById("vehicle-id").style = "display: initial; text-decoration: underline;";
