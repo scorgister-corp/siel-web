@@ -43,7 +43,7 @@ function load() {
             var stationElt = document.createElement("div");
 
             if(element.schedule_relationship == 1) {
-                stationElt.setAttribute("class", "station visited");
+                stationElt.setAttribute("class", "station skipped");
             }else {
                 switch(element.state) {
                     case -1:

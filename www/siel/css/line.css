@@ -57,6 +57,11 @@
 
 }
 
+.skipped {
+    background-color: rgb(105, 105, 105);
+    box-shadow: none;
+}
+
 .not-visited-or-in-station {
     background-color: var(--orange-color);
     box-shadow: 0 0 30px var(--orange-color);
