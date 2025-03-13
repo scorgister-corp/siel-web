@@ -4,6 +4,8 @@ var NEXT_STOP = Date.now() / 1000;
 var IN_STATION = false;
 var NEXT_STOP_NAME = "";
 
+var THEORETICAL = false;
+
 function load() {
     if(urlParams.get("tripid") == null || urlParams.get("tripid") == "") {
         alert("trip id not foud");
@@ -27,6 +29,10 @@ function load() {
             document.getElementById("line-id").innerText = result[0]["station_name"] + " - " + result[result.length-1]["station_name"];
             document.getElementById("vehicle-id").innerText = result[0]["vehicle_id"];
             document.getElementById("vehicle-id-link").setAttribute("href", "info.html?vehiculeid=" + result[0]["vehicle_id"]);
+            
+            if(result[0].trip_color) {
+                lineElt.setAttribute("style", lineElt.getAttribute("style") + "background-color: #" + result[0].trip_color + ";");
+            }
         }else {
             document.getElementById("line-id").style = "display: None;";
             document.getElementById("next-stop").style = "display: None;";
@@ -39,6 +45,8 @@ function load() {
         var i = 0;
         var first = true;
         var inStation = false;
+
+        THEORETICAL = result[0].theoretical;
         result.forEach(element => {
             var stationElt = document.createElement("div");
 
@@ -86,9 +94,9 @@ function updateTimer() {
     //console.log(NEXT_STOP - Math.floor(Date.now() / 1000));
     var sec = NEXT_STOP - Math.floor(Date.now() / 1000)
     if(IN_STATION) {
-        document.getElementById("next-stop").innerText = "Stopped at " + NEXT_STOP_NAME + " (" + sec + " s)";
+        document.getElementById("next-stop").innerText = "Stopped at " + NEXT_STOP_NAME + " (" + sec + " s)" + (THEORETICAL?"*":"");
     }else {
-        document.getElementById("next-stop").innerText = "In transit to " + NEXT_STOP_NAME + " (" + sec + " s)";
+        document.getElementById("next-stop").innerText = "In transit to " + NEXT_STOP_NAME + " (" + sec + " s)" + (THEORETICAL?"*":"");
     }
 }
 
