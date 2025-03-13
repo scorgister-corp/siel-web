@@ -3,6 +3,7 @@ const urlParams = new URLSearchParams(window.location.search);
 var NEXT_STOP = Date.now() / 1000;
 var IN_STATION = false;
 var NEXT_STOP_NAME = "";
+var CURRENT_STOP_I = 0;
 
 var THEORETICAL = false;
 
@@ -71,6 +72,7 @@ function load() {
                             NEXT_STOP_NAME = element["station_name"];
                             IN_STATION = false;
                             first = false;
+                            CURRENT_STOP_I = i;
                         }else {
                             stationElt.setAttribute("class", "station not-visited-or-in-station");
                         }
@@ -96,7 +98,10 @@ function updateTimer() {
     if(IN_STATION) {
         document.getElementById("next-stop").innerText = "Stopped at " + NEXT_STOP_NAME + " (" + sec + " s)" + (THEORETICAL?"*":"");
     }else {
-        document.getElementById("next-stop").innerText = "In transit to " + NEXT_STOP_NAME + " (" + sec + " s)" + (THEORETICAL?"*":"");
+        if(CURRENT_STOP_I == 0)
+            document.getElementById("next-stop").innerText = "Departure from " + NEXT_STOP_NAME + " (" + sec + " s)" + (THEORETICAL?"*":"");
+        else
+            document.getElementById("next-stop").innerText = "In transit to " + NEXT_STOP_NAME + " (" + sec + " s)" + (THEORETICAL?"*":"");
     }
 }
 
