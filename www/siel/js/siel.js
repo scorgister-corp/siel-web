@@ -266,7 +266,7 @@ function getInfos(stopName, direction, line, type) {
             return;
 
         var gender = ["F", "M"][Math.floor((Math.random()*2))];
-        var audio = new Audio(AUDIO_URL + "D" + gender + destinationMin + "2" + AUDIO_FORMAT);
+        var audio = new Audio(AUDIO_URL + "D" + gender + destinationMin.toUpperCase() + "2" + AUDIO_FORMAT);
         audio.play();
 
         audioHistory.push(result[0].trip_id);
