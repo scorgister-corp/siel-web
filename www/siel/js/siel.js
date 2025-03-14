@@ -107,9 +107,12 @@ function getInfos(stopName, direction, line, type) {
         var nameMin = result[0]["route_short_name"];
 
         var routes = [];
+        var routeColors = {};
         result.forEach(element => {
-            if(!routes.includes(element["route_short_name"]))
+            if(!routes.includes(element["route_short_name"])) {
                 routes.push(element["route_short_name"]);
+                routeColors[element["route_short_name"]] = element.trip_color;
+            }
         });
 
         if(document.getElementById("routes") != undefined) {
@@ -117,6 +120,8 @@ function getInfos(stopName, direction, line, type) {
             routes.forEach(element => {
                 var spanRoute = document.createElement("span");
                 spanRoute.setAttribute("class", "route-name route-" + element)
+                spanRoute.setAttribute("style", "background-color: #" + routeColors[element] + ";");
+
                 spanRoute.innerText = element;
 
                 
@@ -125,6 +130,7 @@ function getInfos(stopName, direction, line, type) {
 
             if(routes.length > 0) {
                 document.getElementById("header").setAttribute("class", "header-" + routes[0]);
+                document.getElementById("header").setAttribute("style", "border-color: #" + routeColors[routes[0]] + ";");
             }
 
             load(type);
@@ -422,6 +428,7 @@ function updateDirections(e) {
 
 function clear() {
     document.getElementById("header").setAttribute("class", "");
+    document.getElementById("header").setAttribute("style", "");
     document.getElementById("routes").innerText = "";
 
     document.getElementById("dest-min").innerText = "?";
