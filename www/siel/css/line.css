@@ -1,6 +1,7 @@
 
 :root {
-    --orange-color: #f59518
+    --orange-color: #f59518;
+    --line-height: 150vh;
 }
 
 
@@ -71,6 +72,7 @@
     margin-top: 20%;
     margin-left: 40px;
     margin-right: 40px;
+    margin-bottom: 40px;
     color: black;
     background-color: white;
 }
@@ -88,6 +90,7 @@
 
 .head-elt {
     margin: auto;
+    text-align: center;
 }
 
 #line-id {
@@ -130,7 +133,8 @@
     #line {
         flex-direction: column;
         width: 10px;
-        height: 150vh;
+
+        height: var(--line-height);
         margin-bottom: 40px;
     }
 

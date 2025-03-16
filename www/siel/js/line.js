@@ -89,6 +89,8 @@ function load() {
             lineElt.appendChild(stationElt)
             i++;
         });
+
+        lineElt.style.setProperty("--line-height", (i * 150 / 20) + "vh");
     });
 }
 
