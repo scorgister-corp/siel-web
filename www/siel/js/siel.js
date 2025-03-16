@@ -16,9 +16,12 @@ const AUDIO_FORMAT = ".m4a";
 
 var audioHistory = [];
 
+function calcAlertDuration(textAlert) {
+    return textAlert.length * 15 / 80;
+}
+
 function getAlert() {
-    if(lines.length == 0) {
-        document.getElementById("marquee-rtl").hidden = true;
+    if(lines.length == 0 || direction.length == 0) {
         return;
     }
 
@@ -30,8 +33,8 @@ function getAlert() {
 
         alerts = {};
         result.forEach(elt => {
-            var text = "Ligne " + elt.routeId + ": " + elt.text;
-            var duration = text.length * 15 / 80;
+            let text = "Ligne " + elt.routeId + ": " + elt.text;
+            let duration = calcAlertDuration(text);
 
             alerts[elt.alert_id] = {
                 text: text,
@@ -172,7 +175,9 @@ function getInfos(stopName, direction, line, type) {
             document.getElementById("time-2-link").setAttribute("href", "line.html?tripid=" + result[1]["trip_id"]);
 
         }else {
-            document.getElementById("time-max").innerText = "+60";
+            document.getElementById("dest-max").innerText = "?";
+            document.getElementById("time-max").innerText = "?";
+            document.getElementById("time-2-link").href = "#";
         }
 
         if(document.getElementById("other") != undefined) {
@@ -303,7 +308,7 @@ function dateDiff(date1, date2){
 	return diff;
 }
 
-function changeStation(e) {
+function changeStation(e) {    
     updateStation(e.target.value);
 }
 
@@ -318,8 +323,25 @@ function updateStation(stop_name) {
 
 function loadAlertPanel(e) {
     sendPost("/stopdata", {stop_name: stopName}, (success, result) => {
+        console.log(result);
+        
+        if(result && (result.directions.length == 0|| result.lines.length == 0)) {
+            clear();
+            let text = "La sation " + stopName + " n'est actuellement pas desservie.";
+            alerts[0] = {
+                text: text,
+                duration: calcAlertDuration(text)
+            };
+
+            if(!displayAlertSchedule.includes("0"))
+                displayAlertSchedule.push("0");
+
+            updateAlert();
+            return;
+        }
+
         document.getElementById("panel-body").innerText = "";
-        document.getElementById("select-text").innerText = "Select your destination(s) from: " + stopName;
+        document.getElementById("select-text").innerText = "Où voulez-vous aller depuis: " + stopName;
 
         if(e == null)
             destinations = [];
@@ -343,7 +365,7 @@ function loadAlertPanel(e) {
         });
 
         document.getElementById("line-body").innerText = "";
-        document.getElementById("line-text-head").innerText = "Using the line(s)";
+        document.getElementById("line-text-head").innerText = "En utilisant la/les ligne(s)";
     
         if(e == null)
             lines = [];
@@ -437,6 +459,9 @@ function clear() {
     document.getElementById("time-min").innerText = "?";
     document.getElementById("time-max").innerText = "?";
     document.getElementById("other").innerText = "";
+
+    document.getElementById("time-1-link").href = "#";
+    document.getElementById("time-2-link").href = "#";
 }
 
 function load(type) {
@@ -525,5 +550,4 @@ function favAction(e) {
 
 
 getAlert();
-
 setInterval(getAlert, 30000);
