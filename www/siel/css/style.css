@@ -370,8 +370,8 @@ header {
     padding-left: 100%;                   /* placement à droite du conteneur */
     padding-bottom: 5px;
     white-space: nowrap;                  /* pas de passage à la ligne */
-    animation: defilement-rtl infinite linear;
-    animation-duration: 15s;
+   /*animation: defilement-rtl infinite linear;
+    animation-duration: 15s;*/
 }
 
 @keyframes defilement-rtl {

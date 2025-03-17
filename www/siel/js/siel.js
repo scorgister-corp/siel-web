@@ -6,6 +6,8 @@ var lines = [];
 
 var alerts = {};
 
+var localAlertIds = [];
+
 var displayAlertSchedule = [];
 var displayAlert = false;
 
@@ -17,7 +19,7 @@ const AUDIO_FORMAT = ".m4a";
 var audioHistory = [];
 
 function calcAlertDuration(textAlert) {
-    return textAlert.length * 15 / 80;
+    return (textAlert.length * 15 / 80);
 }
 
 function getAlert() {
@@ -31,18 +33,28 @@ function getAlert() {
             return;
         }
 
-        alerts = {};
+        //alerts = {};
+        let ids = [];
         result.forEach(elt => {
             let text = "Ligne " + elt.routeId + ": " + elt.text;
             let duration = calcAlertDuration(text);
+            if(alerts[elt.alert_id] !== undefined) {
+                alerts[elt.alert_id] = {
+                    text: text,
+                    duration: duration
+                };
+            }
 
-            alerts[elt.alert_id] = {
-                text: text,
-                duration: duration
-            };
+            ids.push(elt.alert_id);
             if(!displayAlertSchedule.includes(elt.alert_id))
                 displayAlertSchedule.push(elt.alert_id);
         });
+
+        for(let i of Object.keys(alerts)) {
+            if(!ids.includes(i) && !localAlertIds.includes(i)) {
+                alerts[i] = undefined;
+            }
+        }
 
         updateAlert();
     });
@@ -61,31 +73,39 @@ function updateAlert() {
 function setAlert(id) {
     let p = document.getElementById("marquee-rtl");
 
-    while(alerts[id] == undefined && displayAlertSchedule.length > 0)
+    while(alerts[id] === undefined && displayAlertSchedule.length > 0)
         id = displayAlertSchedule.pop();
     
     if(alerts[id] != undefined)
         displayAlertSchedule.push(id);
 
     if(displayAlertSchedule.length == 0) {
-       p.hidden = true;
-       displayAlert = false;
-       return;
+        p.hidden = true;
+        displayAlert = false;
+        return;
     }else
         p.hidden = false;
 
     var alert = alerts[id];
     
     let div = document.createElement("div");
-    div.setAttribute("style", `animation-duration: ${alert.duration}s;`);
-    div.onanimationiteration = e => {
+    let animation = div.animate([{transform: "translateX(0)"}, {transform: "translateX(-100%)"}],
+        {
+            fill: "forwards",
+            easing: "linear",
+            duration: alert.duration * 1000
+        }
+    );
+
+   animation.onfinish = e => {
         setAlert(displayAlertSchedule.pop());
     }
 
-    div.innerText = alert.text;
-
+    div.innerText = alert.text;    
+    
     p.innerText = "";
     p.appendChild(div);
+    animation.play();
 }
 
 function updateStatusAlert(upt) {
@@ -324,7 +344,7 @@ function updateStation(stop_name) {
 function showNonDesservie(stopName) {
     clear();
 
-    if(alerts["0"]) {
+    if(alerts[0] != undefined) {
         return;
     }
 
@@ -352,6 +372,9 @@ function showNonDesservie(stopName) {
     }
     text += ".";
     
+    if(!localAlertIds.includes("0"))
+        localAlertIds.push("0");
+
     alerts["0"] = {
         text: text,
         duration: calcAlertDuration(text)
@@ -363,7 +386,10 @@ function showNonDesservie(stopName) {
     updateAlert();
 }
 
-function loadAlertPanel(e) {
+function loadAlertPanel(e) {    
+    if(stopName === undefined || stopName === "")
+        return;
+
     sendPost("/stopdata", {stop_name: stopName}, (success, result) => {
         if(result && (result.directions.length == 0|| result.lines.length == 0)) {
             showNonDesservie(stopName);
@@ -483,7 +509,7 @@ function updateDirections(e) {
 function clear() {    
     document.getElementById("header").setAttribute("class", "");
     document.getElementById("header").setAttribute("style", "");
-    document.getElementById("routes").innerText = "";
+    placeDefaultRouteName();
 
     document.getElementById("dest-min").innerText = "?";
     document.getElementById("dest-max").innerText = "?";
@@ -494,6 +520,14 @@ function clear() {
 
     document.getElementById("time-1-link").href = "#";
     document.getElementById("time-2-link").href = "#";
+}
+
+function placeDefaultRouteName() {
+    document.getElementById("routes").innerText = "";
+    let span = document.createElement("span");
+    span.setAttribute("class", "route-name");
+    span.innerText = "?";
+    document.getElementById("routes").appendChild(span);
 }
 
 function clearAlert() {
@@ -586,6 +620,8 @@ function favAction(e) {
         setCookie("favorites", c, 100000);
     }  
 }
+
+placeDefaultRouteName();
 
 
 getAlert();
