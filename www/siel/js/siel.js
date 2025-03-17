@@ -1,7 +1,7 @@
 var semiCol = false;
 
 var stopName = "";
-var destinations = [];
+var directions = [];
 var lines = [];
 
 var alerts = {};
@@ -21,7 +21,7 @@ function calcAlertDuration(textAlert) {
 }
 
 function getAlert() {
-    if(lines.length == 0 || direction.length == 0) {
+    if(lines.length == 0 || directions.length == 0) {
         return;
     }
 
@@ -93,16 +93,16 @@ function updateStatusAlert(upt) {
 }
 
 function updateInfos() {
-    getInfos(stopName, destinations, lines, 1);
+    getInfos(stopName, directions, lines, 1);
 }
 
 function getInfos(stopName, direction, line, type) {
     if(stopName == undefined || direction.length == 0 || lines.length == 0)
         return;
 
-    sendPost("/data", {stop_name: stopName, direction: direction, line: line}, (success, result) => {
-        if(result != null && result.length <= 0) {
-            console.log("Error [0]");
+    sendPost("/data", {stop_name: stopName, direction: direction, line: line}, (success, result) => {        
+        if(!result || (result != null && result.length <= 0)) {
+            showNonDesservie(stopName);
             return;
         }
 
@@ -321,22 +321,52 @@ function updateStation(stop_name) {
     loadAlertPanel();
 }
 
+function showNonDesservie(stopName) {
+    clear();
+
+    if(alerts["0"]) {
+        return;
+    }
+
+    let text = "La station " + stopName + " n'est actuellement pas desservie";
+    if(lines) {
+        if(lines.length == 1) {
+            text += " par la ligne " + lines[0]
+        }else {
+            text += " par les lignes " + lines[0];
+            for(let i = 1; i < lines.length-1; i++)
+                text += ", " + lines[i];
+            text += " et " + lines[lines.length-1];
+        }
+    }
+
+    if(directions) {
+        if(directions.length == 1) {
+            text += " en direction de " + directions[0]
+        }else {
+            text += " en direction de " + directions[0];
+            for(let i = 1; i < directions.length-1; i++)
+                text += ", " + directions[i];
+            text += " et " + directions[directions.length-1];
+        }
+    }
+    text += ".";
+    
+    alerts["0"] = {
+        text: text,
+        duration: calcAlertDuration(text)
+    };
+
+    if(!displayAlertSchedule.includes("0"))
+        displayAlertSchedule.push("0");
+
+    updateAlert();
+}
+
 function loadAlertPanel(e) {
     sendPost("/stopdata", {stop_name: stopName}, (success, result) => {
-        console.log(result);
-        
         if(result && (result.directions.length == 0|| result.lines.length == 0)) {
-            clear();
-            let text = "La sation " + stopName + " n'est actuellement pas desservie.";
-            alerts[0] = {
-                text: text,
-                duration: calcAlertDuration(text)
-            };
-
-            if(!displayAlertSchedule.includes("0"))
-                displayAlertSchedule.push("0");
-
-            updateAlert();
+            showNonDesservie(stopName);
             return;
         }
 
@@ -344,7 +374,7 @@ function loadAlertPanel(e) {
         document.getElementById("select-text").innerText = "Où voulez-vous aller depuis: " + stopName;
 
         if(e == null)
-            destinations = [];
+            directions = [];
         
         result.directions.forEach(element => {
             var div = document.createElement("div");
@@ -353,7 +383,7 @@ function loadAlertPanel(e) {
             div.setAttribute("value", element);
             div.onclick = onclickDest;
 
-            if(e != null && destinations.includes(element))
+            if(e != null && directions.includes(element))
                 div.setAttribute("class", "panel-elt dest-1");
             
             var lab = document.createElement("span");
@@ -408,13 +438,13 @@ function onclickDest(e) {
 }
 
 function updateDirections(e) {
-    destinations = [];
+    directions = [];
     var count = 0;
     for(var i = 0; i < document.getElementById("panel-body").childElementCount; i++) {
         var elt = document.getElementById("panel-body").children[i];
         
         if(elt.getAttribute("class").includes("dest-1")) {
-            destinations.push(elt.id);
+            directions.push(elt.id);
             count++;
         }
     }
@@ -443,12 +473,14 @@ function updateDirections(e) {
     document.getElementById("alert-bg").hidden = true;
 
     clear();
+    clearAlert();
+    
 
     updateInfos();
     getAlert();
 }
 
-function clear() {
+function clear() {    
     document.getElementById("header").setAttribute("class", "");
     document.getElementById("header").setAttribute("style", "");
     document.getElementById("routes").innerText = "";
@@ -462,6 +494,13 @@ function clear() {
 
     document.getElementById("time-1-link").href = "#";
     document.getElementById("time-2-link").href = "#";
+}
+
+function clearAlert() {
+    document.getElementById("marquee-rtl").innerText = "";
+    alerts = {};
+    displayAlertSchedule = [];
+    displayAlert = false;
 }
 
 function load(type) {
