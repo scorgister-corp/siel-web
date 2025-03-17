@@ -33,7 +33,6 @@ function getAlert() {
             return;
         }
 
-        //alerts = {};
         let ids = [];
         result.forEach(elt => {
             let text = "Ligne " + elt.routeId + ": " + elt.text;
@@ -333,11 +332,13 @@ function changeStation(e) {
 }
 
 function updateStation(stop_name) {
+    if(stopName !== undefined && stopName.toUpperCase() == stop_name.toString()) {
+        return;
+    }
+    
     stopName = stop_name;
     audioHistory = [];
-    displayAlert = false;
-    alerts = {};
-    document.getElementById("marquee-rtl").hidden = true;
+    clearAlert();
     loadAlertPanel();
 }
 
@@ -532,6 +533,7 @@ function placeDefaultRouteName() {
 
 function clearAlert() {
     document.getElementById("marquee-rtl").innerText = "";
+    document.getElementById("marquee-rtl").hidden = true;
     alerts = {};
     displayAlertSchedule = [];
     displayAlert = false;
