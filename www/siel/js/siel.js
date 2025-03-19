@@ -327,9 +327,7 @@ function dateDiff(date1, date2){
 	return diff;
 }
 
-function changeStation(e) {    
-    console.log(e);
-    
+function changeStation(e) {        
     updateStation(e.target.value);
 }
 
