@@ -328,6 +328,8 @@ function dateDiff(date1, date2){
 }
 
 function changeStation(e) {    
+    console.log(e);
+    
     updateStation(e.target.value);
 }
 
@@ -350,7 +352,7 @@ function showNonDesservie(stopName) {
     }
 
     let text = "La station " + stopName + " n'est actuellement pas desservie";
-    if(lines) {
+    if(lines !== undefined && lines.length > 0) {
         if(lines.length == 1) {
             text += " par la ligne " + lines[0]
         }else {
@@ -361,7 +363,7 @@ function showNonDesservie(stopName) {
         }
     }
 
-    if(directions) {
+    if(directions !== undefined && directions.length > 0) {
         if(directions.length == 1) {
             text += " en direction de " + directions[0]
         }else {
@@ -549,25 +551,26 @@ function load(type) {
             return
         }
 
-        document.getElementById("stop-selection").innerHTML = "";
+        document.getElementById("stop-names").innerHTML = "";
 
-        if(type == 0) {
+      /* if(type == 0) {
             var defOpt = document.createElement("option");
             defOpt.innerText = "Select your station";
             
-            document.getElementById("stop-selection").appendChild(defOpt);
-        }
+            document.getElementById("stop-names").appendChild(defOpt);
+        }*/
 
         var fav = getCookie("favorites");
+        let favs = undefined;
         if(fav != null) {
-            var favs = fav.split(":");
+            favs = fav.split(":");
             var ok = false;
 
-            var opt = document.createElement("option");
+            /*var opt = document.createElement("option");
             opt.disabled = "true";
             opt.innerText = "----";
-            document.getElementById("stop-selection").appendChild(opt);
-            
+            document.getElementById("stop-names").appendChild(opt);
+            */
             for(var i = 0; i < favs.length; i++) {
                 if(favs[i] == "")
                     continue;
@@ -575,28 +578,32 @@ function load(type) {
                 opt.innerText = favs[i].toUpperCase();
                 opt.value = favs[i];
     
-                document.getElementById("stop-selection").appendChild(opt);
+                document.getElementById("stop-names").appendChild(opt);
                 ok = true;
             }
-            if(ok) {
+            /*if(ok) {
                 var opt = document.createElement("option");
                 opt.disabled = "true";
                 opt.innerText = "----";
-                document.getElementById("stop-selection").appendChild(opt);
-            }
+                document.getElementById("stop-names").appendChild(opt);
+            }*/
         }
-
+        
         for(var i = 0; i < res.length; i++) {
+            if(favs !== undefined && favs.includes(res[i]))
+                continue;
+
             var opt = document.createElement("option");
+                
             opt.innerText = res[i];
 
-            document.getElementById("stop-selection").appendChild(opt);
+            document.getElementById("stop-names").appendChild(opt);
         }
 
         if(stopName != undefined && stopName != "")
-            document.getElementById("stop-selection").value = stopName;
+            document.getElementById("stop-names").value = stopName;
         else if(type == 1)
-            document.getElementById("stop-selection").value = "Select your station";
+            document.getElementById("stop-names").value = "Select your station";
 
     });
 }

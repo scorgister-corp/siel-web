@@ -21,7 +21,28 @@ function updateClock() {
 load(0);
 
 
-document.getElementById("stop-selection").onchange = changeStation;
+document.getElementById("stop-selection").addEventListener(
+    "input",
+    function (e) {
+        if(e.inputType !== "insertReplacementText")
+            return;
+
+        changeStation(e)
+    },
+    false
+);
+
+document.getElementById("stop-selection").onfocus = (e) => {
+    e.target.value = ""; 
+}
+
+document.getElementById("stop-selection").addEventListener("focusout", (e) => {
+    if(stopName === undefined)
+        e.target.value = "";
+    else
+        e.target.value = stopName;  
+});
+
 document.getElementById("select-btn").onclick = updateDirections;
 document.getElementById("routes").onclick = loadAlertPanel;
 
