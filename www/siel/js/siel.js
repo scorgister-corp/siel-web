@@ -155,7 +155,7 @@ function getInfos(stopName, direction, line, type) {
                 document.getElementById("header").setAttribute("style", "border-color: #" + routeColors[routes[0]] + ";");
             }
 
-            load(type);
+            //load(type);
         }
         document.getElementById("dest-min").innerText = destinationMin + (lines.length>1?(" (" + nameMin + ")"):"");
         
@@ -551,24 +551,12 @@ function load(type) {
 
         document.getElementById("stop-names").innerHTML = "";
 
-      /* if(type == 0) {
-            var defOpt = document.createElement("option");
-            defOpt.innerText = "Select your station";
-            
-            document.getElementById("stop-names").appendChild(defOpt);
-        }*/
-
         var fav = getCookie("favorites");
         let favs = undefined;
         if(fav != null) {
             favs = fav.split(":");
             var ok = false;
 
-            /*var opt = document.createElement("option");
-            opt.disabled = "true";
-            opt.innerText = "----";
-            document.getElementById("stop-names").appendChild(opt);
-            */
             for(var i = 0; i < favs.length; i++) {
                 if(favs[i] == "")
                     continue;
@@ -579,29 +567,19 @@ function load(type) {
                 document.getElementById("stop-names").appendChild(opt);
                 ok = true;
             }
-            /*if(ok) {
-                var opt = document.createElement("option");
-                opt.disabled = "true";
-                opt.innerText = "----";
-                document.getElementById("stop-names").appendChild(opt);
-            }*/
         }
         
         for(var i = 0; i < res.length; i++) {
-            if(favs !== undefined && favs.includes(res[i]))
-                continue;
-
             var opt = document.createElement("option");
+            if(favs !== undefined && favs.includes(res[i])) {
+                opt.hidden = true;
+            }
                 
             opt.innerText = res[i];
+            opt.value = res[i];
 
             document.getElementById("stop-names").appendChild(opt);
         }
-
-        if(stopName != undefined && stopName != "")
-            document.getElementById("stop-names").value = stopName;
-        else if(type == 1)
-            document.getElementById("stop-names").value = "Select your station";
 
     });
 }
@@ -614,18 +592,48 @@ function clearAudioHistory() {
 }
 
 function favAction(e) {
-    if(getCookie("favorites") == null) {
+    let cookie = getCookie("favorites");
+    let dataList = document.getElementById("stop-names");
+
+    if(cookie == null) {
         setCookie("favorites", ":" + e.target.value + ":", 100000);
-        e.target.innerText = "Remove " + e.target.value + " of favorites"
-    }else if(!getCookie("favorites").includes(":" + e.target.value + ":")) {
-        setCookie("favorites", getCookie("favorites") + e.target.value + ":");
-        e.target.innerText = "Remove " + e.target.value + " of favorites"
+        e.target.innerText = "Remove " + e.target.value + " of favorites";
+    }else if(!cookie.includes(":" + e.target.value + ":")) {
+        setCookie("favorites", cookie + e.target.value + ":");
+        e.target.innerText = "Remove " + e.target.value + " of favorites";
     }else {
-        e.target.innerText = "Add " + e.target.value + " as favorites"
-        var c = getCookie("favorites");
-        c = c.substring(0, c.indexOf(":" + e.target.value + ":")) + c.substring(c.indexOf(":" + e.target.value + ":") + e.target.value.length + 1, c.length);
-        setCookie("favorites", c, 100000);
-    }  
+        e.target.innerText = "Add " + e.target.value + " as favorites";
+        cookie = cookie.substring(0, cookie.indexOf(":" + e.target.value + ":")) + cookie.substring(cookie.indexOf(":" + e.target.value + ":") + e.target.value.length + 1, cookie.length);
+        setCookie("favorites", cookie, 100000);
+
+        for(let data of dataList.children) {
+            if(data.innerText == e.target.value.toUpperCase()) {
+                dataList.removeChild(data);
+                continue;
+            }
+
+            if(data.innerText.toUpperCase() == e.target.value.toUpperCase()) {
+                data.hidden = false;
+            }
+        }
+
+        return;
+    }
+    // do this if stop is add
+
+    for(let data of dataList.children) {
+        if(data.innerText.toUpperCase() == e.target.value.toUpperCase()) {
+            data.hidden = true;
+            data.innerText = data.innerText.toUpperCase();
+            let offset;
+            if(cookie == null || cookie == undefined || cookie == "")
+                offset = 0;
+            else
+                offset = cookie.split(":").length-2;
+
+            dataList.insertBefore(data, dataList.children[offset]);
+        }
+    }
 }
 
 placeDefaultRouteName();
