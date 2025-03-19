@@ -126,9 +126,9 @@ header {
 }
 
 .header-text {
+    width: 100%;
     padding: 10px;
     padding-bottom: 10px;
-
 }
 
 .clock {
@@ -172,6 +172,7 @@ header {
     padding-right: 10px;
     font-size: 70px;
     margin: 10px;
+    width: 75%;
 
     background-color: white;
     border-style: none;

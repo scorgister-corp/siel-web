@@ -23,8 +23,8 @@ load(0);
 
 document.getElementById("stop-selection").addEventListener(
     "input",
-    function (e) {
-        if(e.inputType !== "insertReplacementText")
+    function (e) {        
+        if(["insertText", "deleteContentBackward"].includes(e.inputType))
             return;
 
         changeStation(e)
