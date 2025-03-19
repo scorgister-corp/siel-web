@@ -26,8 +26,8 @@ document.getElementById("stop-selection").addEventListener(
     function (e) {        
         if(["insertText", "deleteContentBackward"].includes(e.inputType))
             return;
-
         changeStation(e)
+        e.target.blur();
     },
     false
 );
