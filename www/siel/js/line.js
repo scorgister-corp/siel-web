@@ -47,7 +47,7 @@ function load() {
         var i = 0;
         var first = true;
         var inStation = false;
-
+        FIRST_STOP_I = 0;
         THEORETICAL = result[0].theoretical;
         result.forEach(element => {
             var stationElt = document.createElement("div");
