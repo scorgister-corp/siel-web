@@ -4,6 +4,7 @@ var NEXT_STOP = Date.now() / 1000;
 var IN_STATION = false;
 var NEXT_STOP_NAME = "";
 var CURRENT_STOP_I = 0;
+var FIRST_STOP_I = 0;
 
 var THEORETICAL = false;
 
@@ -53,6 +54,9 @@ function load() {
 
             if(element.schedule_relationship == 1) {
                 stationElt.setAttribute("class", "station skipped");
+                if(first) {
+                    FIRST_STOP_I++;
+                }
             }else {
                 switch(element.state) {
                     case -1:
@@ -91,16 +95,16 @@ function load() {
         });
 
         lineElt.style.setProperty("--line-height", (i * 150 / 20) + "vh");
+        updateTimer();
     });
 }
 
 function updateTimer() {
-    //console.log(NEXT_STOP - Math.floor(Date.now() / 1000));
-    var sec = NEXT_STOP - Math.floor(Date.now() / 1000)
+    let sec = NEXT_STOP - Math.floor(Date.now() / 1000)
     if(IN_STATION) {
         document.getElementById("next-stop").innerText = "Stopped at " + NEXT_STOP_NAME + " (" + sec + " s)" + (THEORETICAL?"*":"");
     }else {
-        if(CURRENT_STOP_I == 0)
+        if(CURRENT_STOP_I == FIRST_STOP_I)
             document.getElementById("next-stop").innerText = "Departure from " + NEXT_STOP_NAME + " (" + sec + " s)" + (THEORETICAL?"*":"");
         else
             document.getElementById("next-stop").innerText = "In transit to " + NEXT_STOP_NAME + " (" + sec + " s)" + (THEORETICAL?"*":"");
