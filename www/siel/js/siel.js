@@ -111,6 +111,10 @@ function updateStatusAlert(upt) {
     isUpdateDisplay = upt;
 }
 
+function removeAlert(alertId) {
+    alerts[alertId] = undefined;
+}
+
 function updateInfos() {
     getInfos(stopName, directions, lines, 1);
 }
@@ -124,6 +128,8 @@ function getInfos(stopName, direction, line, type) {
             showNonDesservie(stopName);
             return;
         }
+
+        removeAlert(0); // remove non desservie alert
 
         var destinationMin = result[0]["trip_headsign"];
         var nameMin = result[0]["route_short_name"];
@@ -581,6 +587,8 @@ function load(type) {
             document.getElementById("stop-names").appendChild(opt);
         }
 
+        document.getElementById("stop-selection").placeholder = "Sélectionnez votre station";
+        document.getElementById("stop-selection").disabled = false;
     });
 }
 

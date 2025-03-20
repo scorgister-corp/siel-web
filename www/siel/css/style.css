@@ -371,17 +371,6 @@ header {
     padding-left: 100%;                   /* placement à droite du conteneur */
     padding-bottom: 5px;
     white-space: nowrap;                  /* pas de passage à la ligne */
-   /*animation: defilement-rtl infinite linear;
-    animation-duration: 15s;*/
-}
-
-@keyframes defilement-rtl {
-    0% {
-      transform: translate3d(0,0,0);      /* position initiale à droite */
-    }
-    100% {
-      transform: translate3d(-100%,0,0);  /* position finale à gauche */
-    }
 }
 
 .fav-btn {

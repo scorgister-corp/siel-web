@@ -11,6 +11,7 @@
     <script lang="javascript" src="js/request.js"></script>
 </head>
 <body>
+
     <div id="alert-bg" hidden></div>
     <div id="alert-panel" hidden>
         <h1 id="select-text"></h1>
@@ -27,13 +28,10 @@
         <div class="header-text">
             <div id="routes">
             </div>
-            <input placeholder="Sélectionnez votre station" type="text" list="stop-names" id="stop-selection">
+            <input disabled placeholder="Chargement des stations" type="text" list="stop-names" id="stop-selection">
             <datalist id="stop-names">
 
             </datalist>
-            <!--<select id="stop-selection">
-                <option>?</option>    
-            </select>-->
         </div>
         <div class="right clock"><span id="clock-text">--:--</span></div>
     </header>
