@@ -297,21 +297,21 @@ function getInfos(stopName, direction, line, type) {
 
         var gender = ["F", "M"][Math.floor((Math.random()*2))];
         var audio = new Audio(AUDIO_URL + "D" + gender + destinationMin.toUpperCase() + "2" + AUDIO_FORMAT);
-        audio.play();
+        audio.onended = (e) => {
+            if(next == undefined)
+                return;
 
-        audioHistory.push(result[0].trip_id);
-        if(next == undefined)
-            return;
-
-        diff = dateDiff(new Date(), new Date(Number(next.departure_time + "000")));
-        if(diff.day > 0 || diff.hour > 0)
-            return;
-
-        setTimeout(() => {
+            diff = dateDiff(new Date(), new Date(Number(next.departure_time + "000")));
+            if(diff.day > 0 || diff.hour > 0)
+                return;
+    
+            
             var audio = new Audio(AUDIO_URL + "N" + gender + diff.min + AUDIO_FORMAT);
             audio.play();
-        }, 4000);
-        
+        }
+        audio.play()
+
+        audioHistory.push(result[0].trip_id);
     });
 }
 
@@ -337,7 +337,7 @@ function changeStation(e) {
     updateStation(e.target.value);
 }
 
-function updateStation(stop_name) {
+function updateStation(stop_name, e) {    
     if(stopName !== undefined && stopName.toUpperCase() == stop_name.toString()) {
         return;
     }
@@ -345,7 +345,7 @@ function updateStation(stop_name) {
     stopName = stop_name;
     audioHistory = [];
     clearAlert();
-    loadAlertPanel();
+    loadAlertPanel(e);
 }
 
 function showNonDesservie(stopName) {
@@ -429,7 +429,7 @@ function loadAlertPanel(e) {
 
         document.getElementById("line-body").innerText = "";
         document.getElementById("line-text-head").innerText = "En utilisant la/les ligne(s)";
-    
+        
         if(e == null)
             lines = [];
         
@@ -471,35 +471,42 @@ function onclickDest(e) {
 }
 
 function updateDirections(e) {
-    directions = [];
-    var count = 0;
-    for(var i = 0; i < document.getElementById("panel-body").childElementCount; i++) {
-        var elt = document.getElementById("panel-body").children[i];
-        
-        if(elt.getAttribute("class").includes("dest-1")) {
-            directions.push(elt.id);
-            count++;
+    if(e != "true") {
+        directions = [];
+        var count = 0;
+        for(var i = 0; i < document.getElementById("panel-body").childElementCount; i++) {
+            var elt = document.getElementById("panel-body").children[i];
+            
+            if(elt.getAttribute("class").includes("dest-1")) {
+                directions.push(elt.id);
+                count++;
+            }
         }
-    }
 
-    if(count == 0) {
-        alert("You must select at least one destination !")
-        return;    
-    }
-
-    lines = [];
-    count = 0;
-    for(var i = 0; i < document.getElementById("line-body").childElementCount; i++) {
-        var elt = document.getElementById("line-body").children[i];
-        if(elt.getAttribute("class").includes("dest-1")) {
-            lines.push(elt.id);
-            count++;
+        if(count == 0) {
+            alert("You must select at least one destination !")
+            return;    
         }
-    }
 
-    if(count == 0) {
-        alert("You must select at least one line !")
-        return;    
+        lines = [];
+        count = 0;
+        for(var i = 0; i < document.getElementById("line-body").childElementCount; i++) {
+            var elt = document.getElementById("line-body").children[i];
+            if(elt.getAttribute("class").includes("dest-1")) {
+                lines.push(elt.id);
+                count++;
+            }
+        }
+
+        if(count == 0) {
+            alert("You must select at least one line !")
+            return;    
+        }
+    }else {
+        if(directions == undefined || directions.length == 0 || lines == undefined || lines.length == 0) {
+            alert("You must select at least one line and one destination !")
+            return;
+        }
     }
     
     document.getElementById("alert-panel").hidden = true;

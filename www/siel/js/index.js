@@ -1,3 +1,9 @@
+const urlParams = new URLSearchParams(window.location.search);
+var selectedStop = urlParams.get('stop_name');
+var selectedDirections = urlParams.get('direction');
+var selectedLines = urlParams.get('line');
+var skip = urlParams.get('skip');
+
 function updateClock() {
     var date = new Date();
     var hours = date.getHours();
@@ -18,8 +24,29 @@ function updateClock() {
 
 }
 
-load(0);
 
+load(0);
+if(selectedStop !== null) {
+    if(selectedDirections !== null) {
+        selectedDirections = selectedDirections.split(",");
+        if(selectedDirections.length != 0) {
+            directions = selectedDirections
+        }
+    }
+
+    if(selectedLines !== null) {
+        selectedLines = selectedLines.split(",");
+        if(selectedLines.length != 0) {
+            lines = selectedLines;            
+        }
+    }
+
+    if(skip !== null && skip == "true") {
+        stopName = selectedStop;
+        updateDirections(skip);
+    }else
+        updateStation(selectedStop, 0);
+}
 
 document.getElementById("stop-selection").addEventListener(
     "input",
