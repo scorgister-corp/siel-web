@@ -16,7 +16,7 @@ var displayAlert = false;
 var freezAlert = false;
 
 const AUDIO_URL = "/sound/";
-const AUDIO_FORMAT = ".m4a";
+const AUDIO_FORMAT = ".mp3";
 
 var audioHistory = [];
 
