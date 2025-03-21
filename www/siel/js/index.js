@@ -25,28 +25,43 @@ function updateClock() {
 }
 
 
-load(0);
-if(selectedStop !== null) {
-    if(selectedDirections !== null) {
-        selectedDirections = selectedDirections.split(",");
-        if(selectedDirections.length != 0) {
-            directions = selectedDirections
+
+load(0, () => {
+    if(selectedStop !== null) {
+        let ok = false;
+        for(let stN of possibleStopNames) {            
+            if(stN.toUpperCase() == selectedStop.toUpperCase()) {
+                selectedStop = stN;
+                ok = true;
+                break;
+            }
+        }
+
+        if(ok) {
+            if(selectedDirections !== null) {
+                selectedDirections = selectedDirections.split(",");
+                if(selectedDirections.length != 0) {
+                    directions = selectedDirections
+                }
+            }
+
+            if(selectedLines !== null) {
+                selectedLines = selectedLines.split(",");
+                if(selectedLines.length != 0) {
+                    lines = selectedLines;            
+                }
+            }
+
+            document.getElementById("stop-selection").value = selectedStop;
+
+            if(skip !== null && skip == "true") {
+                stopName = selectedStop;
+                updateDirections(skip);
+            }else
+                updateStation(selectedStop, 0); 
         }
     }
-
-    if(selectedLines !== null) {
-        selectedLines = selectedLines.split(",");
-        if(selectedLines.length != 0) {
-            lines = selectedLines;            
-        }
-    }
-
-    if(skip !== null && skip == "true") {
-        stopName = selectedStop;
-        updateDirections(skip);
-    }else
-        updateStation(selectedStop, 0);
-}
+});
 
 document.getElementById("stop-selection").addEventListener(
     "input",

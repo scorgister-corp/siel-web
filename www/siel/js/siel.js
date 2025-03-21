@@ -1,5 +1,7 @@
 var semiCol = false;
 
+var possibleStopNames = [];
+
 var stopName = "";
 var directions = [];
 var lines = [];
@@ -552,7 +554,7 @@ function clearAlert() {
     displayAlert = false;
 }
 
-function load(type) {
+function load(type, callBack) {
     if(type == 2)
         return;
 
@@ -592,10 +594,14 @@ function load(type) {
             opt.value = res[i];
 
             document.getElementById("stop-names").appendChild(opt);
+            possibleStopNames.push(res[i]);
         }
 
         document.getElementById("stop-selection").placeholder = "Sélectionnez votre station";
         document.getElementById("stop-selection").disabled = false;
+        if(callBack != undefined) {
+            callBack();
+        }
     });
 }
 
