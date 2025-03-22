@@ -6,15 +6,20 @@ var NEXT_STOP_NAME = "";
 var CURRENT_STOP_I = 0;
 var FIRST_STOP_I = 0;
 
+var DIRECTION = undefined;
+var LINE = undefined;
+
 var THEORETICAL = false;
 
+var TRIP_ID = urlParams.get("tripid");
+
 function load() {
-    if(urlParams.get("tripid") == null || urlParams.get("tripid") == "") {
+    if(TRIP_ID == null || TRIP_ID == "") {
         alert("trip id not foud");
         window.location = "index.html";
     }
 
-    sendGet("/trip?tripid=" + urlParams.get("tripid"), (success, result) => {
+    sendGet("/trip?tripid=" + TRIP_ID, (success, result) => {
         var lineElt = document.getElementById("line");
         lineElt.innerHTML = "";
 
@@ -49,6 +54,9 @@ function load() {
         var inStation = false;
         FIRST_STOP_I = 0;
         THEORETICAL = result[0].theoretical;
+        DIRECTION = result[result.length-1].station_name;
+        LINE = result[0].route_short_name;
+
         result.forEach(element => {
             var stationElt = document.createElement("div");
 
@@ -86,11 +94,17 @@ function load() {
             }
             stationElt.style = '--ratio: ' + i / (result.length - 1) * 100 + '%;';
             stationElt.setAttribute("value", element["departure_time"]);
+            
             var nameElt = document.createElement("div");
+            let a = document.createElement("a");
+
             nameElt.setAttribute("class", "station-name");
-            nameElt.innerText = element.station_name;
+            a.innerText = element.station_name;
+            a.href = "index.html?stop_name=" + element.station_name + "&direction=" + DIRECTION + "&line=" + LINE + "&skip=true&highlight=" + TRIP_ID;
+            nameElt.appendChild(a);
             stationElt.appendChild(nameElt);
             lineElt.appendChild(stationElt)
+
             i++;
         });
 

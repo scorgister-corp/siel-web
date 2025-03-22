@@ -15,6 +15,9 @@ var displayAlert = false;
 
 var freezAlert = false;
 
+var HIGHLIGHT_ID = undefined;
+var FIRST_LOAD = true;
+
 const AUDIO_URL = "/sound/";
 const AUDIO_FORMAT = ".mp3";
 
@@ -162,8 +165,6 @@ function getInfos(stopName, direction, line, type) {
                 document.getElementById("header").setAttribute("class", "header-" + routes[0]);
                 document.getElementById("header").setAttribute("style", "border-color: #" + routeColors[routes[0]] + ";");
             }
-
-            //load(type);
         }
         document.getElementById("dest-min").innerText = destinationMin + (lines.length>1?(" (" + nameMin + ")"):"");
         
@@ -177,6 +178,12 @@ function getInfos(stopName, direction, line, type) {
             document.getElementById("time-min").innerText = (result[0].theoretical?"*":"") + "+60";
         else
             document.getElementById("time-min").innerText = (result[0].theoretical?"*":"") + diffMin.min;
+
+        if(HIGHLIGHT_ID != undefined && result[0].trip_id == HIGHLIGHT_ID) {
+            document.getElementById("time-min").setAttribute("class", "time-number highlight");
+        }else {
+            document.getElementById("time-min").setAttribute("class", "time-number");
+        }
 
         var v1ID = result[0]["vehicle_id"];
         document.getElementById("time-1").setAttribute("title", (v1ID==null?"no vehicle assigned":v1ID));
@@ -201,10 +208,18 @@ function getInfos(stopName, direction, line, type) {
             document.getElementById("time-2").setAttribute("title", (v2ID==null?"no vehicle assigned":v2ID));
             document.getElementById("time-2-link").setAttribute("href", "line.html?tripid=" + result[1]["trip_id"]);
 
+            if(HIGHLIGHT_ID != undefined && result[1].trip_id == HIGHLIGHT_ID) {
+                document.getElementById("time-max").setAttribute("class", "time-number highlight");
+            }else {
+                document.getElementById("time-max").setAttribute("class", "time-number");
+            }
+    
+
         }else {
             document.getElementById("dest-max").innerText = "?";
             document.getElementById("time-max").innerText = "?";
             document.getElementById("time-2-link").href = "#";
+            document.getElementById("time-max").setAttribute("class", "time-number");
         }
 
         if(document.getElementById("other") != undefined) {
@@ -214,10 +229,9 @@ function getInfos(stopName, direction, line, type) {
                 var mainA = document.createElement("a");
                 mainA.setAttribute("href", "line.html?tripid=" + result[i]["trip_id"]);
 
-
                 var mainDiv = document.createElement("div");
                 mainDiv.setAttribute("class", "other-container");
-
+                mainDiv.id = result[i].trip_id;
                 var divLeft = document.createElement("div");
                 var divNum = document.createElement("div");
                 divNum.setAttribute("class", "sub-count")
@@ -230,6 +244,10 @@ function getInfos(stopName, direction, line, type) {
 
                 var destinationSpan = document.createElement("span");
                 destinationSpan.innerText = result[i]["trip_headsign"];
+
+                if(FIRST_LOAD && HIGHLIGHT_ID != undefined && result[i].trip_id == HIGHLIGHT_ID) {
+                    destinationSpan.setAttribute("class", "highlight");
+                }
 
                 numSpan.appendChild(e);
                 numSpan.innerHTML += " ";
@@ -281,8 +299,12 @@ function getInfos(stopName, direction, line, type) {
             document.getElementById("other").appendChild(mainDiv);
         }
 
-        clearAudioHistory();
+        let highlightElt = document.getElementById(HIGHLIGHT_ID);
+        if(FIRST_LOAD && highlightElt != undefined)
+            highlightElt.scrollIntoView();
 
+        clearAudioHistory();
+        FIRST_LOAD = false;
         if(audioHistory.includes(result[0].trip_id))
             return;
 

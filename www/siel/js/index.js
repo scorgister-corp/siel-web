@@ -3,6 +3,7 @@ var selectedStop = urlParams.get('stop_name');
 var selectedDirections = urlParams.get('direction');
 var selectedLines = urlParams.get('line');
 var skip = urlParams.get('skip');
+var highlight = urlParams.get('highlight');
 
 function updateClock() {
     var date = new Date();
@@ -21,10 +22,15 @@ function updateClock() {
         document.getElementById("clock-text").innerText = hours + ":" + min;
 
     semiCol = !semiCol;
-
 }
 
+if(highlight != undefined)
+    HIGHLIGHT_ID = highlight;
 
+let clearURL = window.location.toString();
+clearURL = clearURL.substring(0, clearURL.indexOf("?"));
+
+window.history.replaceState({id: "100"}, "SIEL", clearURL);
 
 load(0, () => {
     if(selectedStop !== null) {

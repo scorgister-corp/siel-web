@@ -1,6 +1,6 @@
 @font-face {
     font-family: "Parasine-Regular";
-    src: url("/font/Parasine.woff") format("woff"),
+    src: url("/font/Parisine.woff") format("woff"),
     url("/font/Parisine.woff2") format("woff2"),
     url("/font/Parisine.ttf") format("truetype");
 }
@@ -378,6 +378,24 @@ header {
     margin-bottom: 20px;
     margin-left: auto;
     margin-right: auto;
+}
+
+.highlight {
+    animation: highlight-anim 1s linear 3;
+}
+
+@keyframes highlight-anim {
+    0% {
+        opacity: 100;
+    }
+
+    50% {
+        opacity: 0%;
+    }
+
+    100% {
+        opacity: 100%;
+    }
 }
 
 @media (max-width: 1000px) {
