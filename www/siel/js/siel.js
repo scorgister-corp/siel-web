@@ -42,7 +42,8 @@ function getAlert() {
         result.forEach(elt => {
             let text = "Ligne " + elt.routeId + ": " + elt.text;
             let duration = calcAlertDuration(text);
-            if(alerts[elt.alert_id] !== undefined) {
+            console.log(alerts[elt.alert_id]);
+            if(alerts[elt.alert_id] == undefined) {
                 alerts[elt.alert_id] = {
                     text: text,
                     duration: duration
@@ -53,7 +54,7 @@ function getAlert() {
             if(!displayAlertSchedule.includes(elt.alert_id))
                 displayAlertSchedule.push(elt.alert_id);
         });
-
+        
         for(let i of Object.keys(alerts)) {
             if(!ids.includes(i) && !localAlertIds.includes(i)) {
                 alerts[i] = undefined;
