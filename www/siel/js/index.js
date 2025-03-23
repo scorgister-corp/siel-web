@@ -71,9 +71,7 @@ load(0, () => {
 
 document.getElementById("stop-selection").addEventListener(
     "input",
-    function (e) { 
-        console.log(e);
-          
+    function (e) {           
         if(["insertText", "deleteContentBackward", "insertCompositionText"].includes(e.inputType))
             return;
         changeStation(e)
