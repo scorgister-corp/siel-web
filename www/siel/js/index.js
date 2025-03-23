@@ -71,8 +71,10 @@ load(0, () => {
 
 document.getElementById("stop-selection").addEventListener(
     "input",
-    function (e) {        
-        if(["insertText", "deleteContentBackward"].includes(e.inputType))
+    function (e) { 
+        console.log(e);
+          
+        if(["insertText", "deleteContentBackward", "insertCompositionText"].includes(e.inputType))
             return;
         changeStation(e)
         e.target.blur();

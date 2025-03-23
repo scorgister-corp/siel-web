@@ -288,7 +288,7 @@ function getInfos(stopName, direction, line, type) {
             mainDiv.setAttribute("class", "other-container");
 
             var but = document.createElement("button");
-            if(getCookie("favorites") == null || !getCookie("favorites").includes(":" + stopName + ":"))
+            if(localStorage.getItem("favorites") == null || !JSON.parse(localStorage.favorites).includes(stopName))
                 but.innerText = "Add " + stopName + " as favorites";
             else
                 but.innerText = "Remove " + stopName + " of favorites";
@@ -539,7 +539,9 @@ function updateDirections(e) {
 
     clear();
     clearAlert();
-    
+
+    //analytics endpoint
+    sendPost("/choose", {stop_name: stopName, direction: directions, line: lines}, (success, result) => {});
 
     updateInfos();
     getAlert();
@@ -567,7 +569,7 @@ function clear() {
 function placeDefaultRouteName() {
     if(document.getElementById("routes") == undefined)
         return;
-    
+
     document.getElementById("routes").innerText = "";
     let span = document.createElement("span");
     span.setAttribute("class", "route-name");
@@ -595,10 +597,9 @@ function load(type, callBack) {
 
         document.getElementById("stop-names").innerHTML = "";
 
-        var fav = getCookie("favorites");
-        let favs = undefined;
-        if(fav != null) {
-            favs = fav.split(":");
+        var favs = localStorage.getItem("favorites");
+        if(favs != null) {
+            favs = JSON.parse(favs);
             var ok = false;
 
             for(var i = 0; i < favs.length; i++) {
@@ -615,7 +616,7 @@ function load(type, callBack) {
         
         for(var i = 0; i < res.length; i++) {
             var opt = document.createElement("option");
-            if(favs !== undefined && favs.includes(res[i])) {
+            if(favs !== null && favs.includes(res[i])) {
                 opt.hidden = true;
             }
                 
@@ -642,45 +643,43 @@ function clearAudioHistory() {
 }
 
 function favAction(e) {
-    let cookie = getCookie("favorites");
     let dataList = document.getElementById("stop-names");
-
-    if(cookie == null) {
-        setCookie("favorites", ":" + e.target.value + ":", 100000);
-        e.target.innerText = "Remove " + e.target.value + " of favorites";
-    }else if(!cookie.includes(":" + e.target.value + ":")) {
-        setCookie("favorites", cookie + e.target.value + ":");
-        e.target.innerText = "Remove " + e.target.value + " of favorites";
+    
+    let favorites = [];
+    if(localStorage.getItem("favorites") == null) {
+        favorites.push(e.target.value);
     }else {
-        e.target.innerText = "Add " + e.target.value + " as favorites";
-        cookie = cookie.substring(0, cookie.indexOf(":" + e.target.value + ":")) + cookie.substring(cookie.indexOf(":" + e.target.value + ":") + e.target.value.length + 1, cookie.length);
-        setCookie("favorites", cookie, 100000);
+        favorites = JSON.parse(localStorage.favorites);
+        for(let i = 0; i < favorites.length; i++) {
+            if(favorites[i] == e.target.value) {
+                favorites.splice(i, 1);
+                localStorage.setItem("favorites", JSON.stringify(favorites));
+                e.target.innerText = "Add " + e.target.value + " as favorites";
 
-        for(let data of dataList.children) {
-            if(data.innerText == e.target.value.toUpperCase()) {
-                dataList.removeChild(data);
-                continue;
-            }
-
-            if(data.innerText.toUpperCase() == e.target.value.toUpperCase()) {
-                data.hidden = false;
+                for(let data of dataList.children) {
+                    if(data.innerText == e.target.value.toUpperCase()) {
+                        dataList.removeChild(data);
+                        continue;
+                    }
+        
+                    if(data.innerText.toUpperCase() == e.target.value.toUpperCase()) {
+                        data.hidden = false;
+                    }
+                }
+                return;            
             }
         }
-
-        return;
+        favorites.push(e.target.value);
     }
-    // do this if stop is add
+    
+    localStorage.setItem("favorites", JSON.stringify(favorites));
+    e.target.innerText = "Remove " + e.target.value + " of favorites";
 
     for(let data of dataList.children) {
         if(data.innerText.toUpperCase() == e.target.value.toUpperCase()) {
             data.hidden = true;
             data.innerText = data.innerText.toUpperCase();
-            let offset;
-            if(cookie == null || cookie == undefined || cookie == "")
-                offset = 0;
-            else
-                offset = cookie.split(":").length-2;
-
+            let offset = favorites.length - 1;
             dataList.insertBefore(data, dataList.children[offset]);
         }
     }
