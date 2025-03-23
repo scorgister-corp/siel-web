@@ -4,16 +4,16 @@ const direction = urlParams.get('direction');
 const line = urlParams.get('line');
 
 function updateInfosLightweight() {
-    getInfos(stopName, destinations, lines, 2);
+    getInfos(stopName, directions, lines, 2);
 }
 
 if (stopName === null || direction === null || line === null) {
     alert("No stop name, direction or line provided");
 }else {
     lines = line.split(",");
-    destinations = direction.split(",");
+    directions = direction.split(",");
     
-    if(lines.length == 0 || destinations.length == 0) {
+    if(lines.length == 0 || directions.length == 0) {
         alert("No stop name, direction or line provided");
 
     }else {

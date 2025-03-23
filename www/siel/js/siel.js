@@ -545,23 +545,29 @@ function updateDirections(e) {
     getAlert();
 }
 
-function clear() {    
-    document.getElementById("header").setAttribute("class", "");
-    document.getElementById("header").setAttribute("style", "");
-    placeDefaultRouteName();
+function clear() {
+    if(document.getElementById("header") != undefined) { 
+        document.getElementById("header").setAttribute("class", "");
+        document.getElementById("header").setAttribute("style", "");
+        placeDefaultRouteName();
+    }
 
     document.getElementById("dest-min").innerText = "?";
     document.getElementById("dest-max").innerText = "?";
 
     document.getElementById("time-min").innerText = "?";
     document.getElementById("time-max").innerText = "?";
-    document.getElementById("other").innerText = "";
+    if(document.getElementById("other") != undefined)
+        document.getElementById("other").innerText = "";
 
     document.getElementById("time-1-link").href = "#";
     document.getElementById("time-2-link").href = "#";
 }
 
 function placeDefaultRouteName() {
+    if(document.getElementById("routes") == undefined)
+        return;
+    
     document.getElementById("routes").innerText = "";
     let span = document.createElement("span");
     span.setAttribute("class", "route-name");
