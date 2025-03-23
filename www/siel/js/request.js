@@ -1,22 +1,40 @@
 const API_HOST = "https://api.mtp.scorgister.net";
 //const API_HOST = "http://localhost:8000";
+//const API_HOST = "http://192.168.0.13:8000";
 
 function sendPost(url, body, response = function() {}) {
+    let headers = {'Content-Type': 'application/json', 'X-Application-UID': getUID()};
+
     fetch(API_HOST + url, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
+        headers: headers,
         body: JSON.stringify(body)
     }).then(response => response.json())
     .then(data => response(true, data));
 }
 
 function sendGet(url, response = function() {}) {
+    let headers = {'X-Application-UID': getUID()};
+
     fetch(API_HOST + url, {
-        method: 'GET'
+        method: 'GET',
+        headers: headers
     }).then(response => response.json())
     .then(data => response(true, data));
+}
+
+function getUID() {
+    let uid = localStorage.getItem("uid");
+    if(uid == null) {
+        let uid = generateUniqueId();
+        localStorage.setItem("uid", uid);
+    }
+
+    return uid;
+}
+
+function generateUniqueId() {
+    return 'id-' + Date.now().toString(16) + '-' + Math.random().toString(16).substring(2, 5);
 }
 
 function getCookie(cname) {
@@ -32,14 +50,14 @@ function getCookie(cname) {
             return c.substring(name.length, c.length);
     }
 
-    return null;
+    return undefined;
 }
 
 function setCookie(name, value, days) {
     var expires = "";
     if(days) {
         var date = new Date();
-        date.setTime(date.getTime() + (days*24*60*60*1000));
+        date.setTime(date.getTime() + (days*24*60*60*1000));        
         expires = "; expires=" + date.toUTCString();
     }
     document.cookie = name + "=" + (value || "")  + expires + "; path=/";
