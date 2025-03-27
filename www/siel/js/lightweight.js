@@ -4,7 +4,7 @@ const direction = urlParams.get('direction');
 const line = urlParams.get('line');
 
 function updateInfosLightweight() {
-    getInfos(stopName, directions, lines, 2);
+    getInfos();
 }
 
 if (stopName === null || direction === null || line === null) {

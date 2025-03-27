@@ -3,8 +3,7 @@ var semiCol = false;
 var possibleStopNames = [];
 
 var stopName = "";
-var directions = [];
-var lines = [];
+var directions = {};
 
 var alerts = {};
 
@@ -23,16 +22,39 @@ const AUDIO_FORMAT = ".mp3";
 
 var audioHistory = [];
 
+var transportName = undefined;
+var stationName = undefined;
+
+
 function calcAlertDuration(textAlert) {
     return (textAlert.length * 15 / 80);
 }
 
+function getAllDirections() {
+    let dirs = [];
+    for(let route in directions)
+        if(!dirs.includes(directions[route]))
+            dirs.push(directions[route]);
+    return dirs;
+}
+
+function getDirections(routeId) {
+    let dirs = [];
+    if(directions[routeId] != undefined)
+        dirs = directions[routeId];
+    return dirs;
+}
+
+function getAllRoutes() {
+    return Object.keys(directions);
+}
+
 function getAlert() {
-    if(lines.length == 0 || directions.length == 0) {
+    if(getAllDirections().length == 0) {
         return;
     }
 
-    sendPost("/alert", {line: lines}, (success, result) => {
+    sendPost("/alert", {line: getAllRoutes()}, (success, result) => {
         if(!success) {
             console.log("Error [-1]");
             return;
@@ -122,14 +144,14 @@ function removeAlert(alertId) {
 }
 
 function updateInfos() {
-    getInfos(stopName, directions, lines, 1);
+    getInfos();
 }
 
-function getInfos(stopName, direction, line, type) {
-    if(stopName == undefined || direction.length == 0 || lines.length == 0)
+function getInfos() {
+    if(stopName == undefined || getAllDirections().length == 0)
         return;
 
-    sendPost("/data", {stop_name: stopName, direction: direction, line: line}, (success, result) => {        
+    sendPost("/data", {stop_name: stopName, directions: directions}, (success, result) => {        
         if(!result || (result != null && result.length <= 0)) {
             showNonDesservie(stopName);
             return;
@@ -167,7 +189,7 @@ function getInfos(stopName, direction, line, type) {
                 document.getElementById("header").setAttribute("style", "border-color: #" + routeColors[routes[0]] + ";");
             }
         }
-        document.getElementById("dest-min").innerText = destinationMin + (lines.length>1?(" (" + nameMin + ")"):"");
+        document.getElementById("dest-min").innerText = destinationMin + (getAllRoutes().length>1?(" (" + nameMin + ")"):"");
         
         var timeMin = result[0]["departure_time"] + "000";
         var timeMax = undefined;
@@ -194,7 +216,7 @@ function getInfos(stopName, direction, line, type) {
             var destinationMax = result[1]["trip_headsign"];
             var nameMax = result[1]["route_short_name"];
             
-            document.getElementById("dest-max").innerText = destinationMax + (lines.length>1?(" (" + nameMax + ")"):"");
+            document.getElementById("dest-max").innerText = destinationMax + (getAllRoutes().length>1?(" (" + nameMax + ")"):"");
             
             timeMax = result[1]["departure_time"] + "000";
             var tMax = new Date(Number(timeMax));
@@ -380,26 +402,30 @@ function showNonDesservie(stopName) {
         return;
     }
 
-    let text = "La station " + stopName + " n'est actuellement pas desservie";
-    if(lines !== undefined && lines.length > 0) {
-        if(lines.length == 1) {
-            text += " par la ligne " + lines[0]
+    let allRoute = getAllRoutes();
+
+    let text = "La " + stationName + " " + stopName + " n'est actuellement pas desservie";
+    if(allRoute !== undefined && allRoute.length > 0) {
+        if(allRoute.length == 1) {
+            text += " par la ligne " + allRoute[0]
         }else {
-            text += " par les lignes " + lines[0];
-            for(let i = 1; i < lines.length-1; i++)
-                text += ", " + lines[i];
-            text += " et " + lines[lines.length-1];
+            text += " par les lignes " + allRoute[0];
+            for(let i = 1; i < allRoute.length-1; i++)
+                text += ", " + allRoute[i];
+            text += " et " + allRoute[allRoute.length-1];
         }
     }
 
-    if(directions !== undefined && directions.length > 0) {
-        if(directions.length == 1) {
-            text += " en direction de " + directions[0]
+    let allDirections = getAllDirections();
+
+    if(allDirections !== undefined && allDirections.length > 0) {
+        if(allDirections.length == 1) {
+            text += " en direction de " + allDirections[0]
         }else {
-            text += " en direction de " + directions[0];
-            for(let i = 1; i < directions.length-1; i++)
-                text += ", " + directions[i];
-            text += " et " + directions[directions.length-1];
+            text += " en direction de " + allDirections[0];
+            for(let i = 1; i < allDirections.length-1; i++)
+                text += ", " + allDirections[i];
+            text += " et " + allDirections[allDirections.length-1];
         }
     }
     text += ".";
@@ -422,8 +448,8 @@ function loadAlertPanel(e) {
     if(stopName === undefined || stopName === "")
         return;
 
-    sendPost("/stopdata", {stop_name: stopName}, (success, result) => {
-        if(result && (result.directions.length == 0|| result.lines.length == 0)) {
+    sendPost("/stopdata", {stop_name: stopName}, (success, result) => {        
+        if(result === undefined || Object.keys(result) == 0) {
             showNonDesservie(stopName);
             return;
         }
@@ -432,49 +458,74 @@ function loadAlertPanel(e) {
         document.getElementById("select-text").innerText = "Où voulez-vous aller depuis: " + stopName;
 
         if(e == null)
-            directions = [];
-        
-        result.directions.forEach(element => {
-            var div = document.createElement("div");
-            div.setAttribute("class", "panel-elt dest-0");
-            div.setAttribute("id", element);
-            div.setAttribute("value", element);
-            div.onclick = onclickDest;
+            directions = {};
 
-            if(e != null && directions.includes(element))
-                div.setAttribute("class", "panel-elt dest-1");
+        let routes = [];
+        for(let stopName in result) {
+            for(let i = 0; i < result[stopName].length; i++)
+                if(!routes.includes(result[stopName][i].id)) {
+                    routes.push(result[stopName][i].id);
+                    
+                    let routeDiv = document.createElement("div");
+                    routeDiv.setAttribute("class", "panel-body");
+                    if(result[stopName][i].id === undefined || result[stopName][i].id === "")
+                        routeDiv.id = "empty";
+                    else
+                        routeDiv.id = result[stopName][i].id;
+
+                    let routeTitle = document.createElement("span");
+                    routeTitle.setAttribute("class", "panel-elt-title");
+                    routeTitle.onclick = (e) => {
+
+                        for(let i = 0; i < e.target.parentElement.childElementCount; i++) {
+                            if(e.target.parentElement.children[i] == e.target && i < e.target.parentElement.childElementCount - 1) {
+                                let status = "0";
+                                for(let elt of e.target.parentElement.children[i+1].children) {
+                                    if(elt.getAttribute("class").includes("dest-0")) {
+                                        status = "1";
+                                        break;
+                                    }
+                                }
+                                for(let elt of e.target.parentElement.children[i+1].children) {
+                                    elt.setAttribute("class", "panel-elt dest-" + status);
+                                }
+                                
+                            }
+                        }
+                        
+                    };
+                    routeTitle.innerText = result[stopName][i].long_name;
+                    if(![undefined, ""].includes(result[stopName][i].short_name))
+                        routeTitle.innerText += " (" + result[stopName][i].short_name + ")";
+
+                    document.getElementById("panel-body").appendChild(routeTitle);
+                    document.getElementById("panel-body").appendChild(routeDiv);
+                }
+        }
+
+        for(let stationName in result) {
+            let stationRoutes = result[stationName];
             
-            var lab = document.createElement("span");
-            lab.innerText = element;
+            for(let route of stationRoutes) {
+                let div = document.createElement("div");
+                div.setAttribute("class", "panel-elt dest-0");
+                div.id = stationName;
 
-            div.appendChild(lab);
+                div.onclick = onclickDest;
+                
+                if(e != null && getDirections(route.id==""?"empty":route.id).includes(stationName) && (route.id == "" || getAllRoutes().includes(route.id)))
+                    div.setAttribute("class", "panel-elt dest-1");
 
-            document.getElementById("panel-body").appendChild(div);
-        });
+                let label = document.createElement("span");
+                label.innerText = stationName;
 
-        document.getElementById("line-body").innerText = "";
-        document.getElementById("line-text-head").innerText = "En utilisant la/les ligne(s)";
-        
-        if(e == null)
-            lines = [];
-        
-        result.lines.forEach(element => {
-            var div = document.createElement("div");
-            div.setAttribute("class", "panel-elt dest-0");
-            div.setAttribute("id", element);
-            div.setAttribute("value", element);
-            div.onclick = onclickDest;
-
-            if(e != null && lines.includes(element))
-                div.setAttribute("class", "panel-elt dest-1");
-
-            var lab = document.createElement("span");
-            lab.innerText = element;
-
-            div.appendChild(lab);
-
-            document.getElementById("line-body").appendChild(div);
-        });
+                div.appendChild(label);
+                if(route.id === undefined || route.id === "")
+                    document.getElementById("empty").appendChild(div);
+                else
+                    document.getElementById(route.id).appendChild(div);
+            }
+        }
 
         document.getElementById("alert-panel").hidden = false;
         document.getElementById("alert-bg").hidden = false;
@@ -497,39 +548,38 @@ function onclickDest(e) {
 
 function updateDirections(e) {
     if(e != "true") {
-        directions = [];
-        var count = 0;
-        for(var i = 0; i < document.getElementById("panel-body").childElementCount; i++) {
-            var elt = document.getElementById("panel-body").children[i];
-            
-            if(elt.getAttribute("class").includes("dest-1")) {
-                directions.push(elt.id);
-                count++;
+        directions = {};
+
+        let count = 0;
+        for(let i = 0; i < document.getElementById("panel-body").childElementCount; i++) {
+            let routeElt = document.getElementById("panel-body").children[i];
+            for(let j = 0; j < routeElt.childElementCount; j++) {
+                if(routeElt.children[j].getAttribute("class").includes("dest-1")) {
+                    if(routeElt.id == "empty") {
+                        if(directions["empty"] === undefined)
+                            directions[routeElt.id] = [];
+
+                        directions["empty"].push(routeElt.children[j].id);
+                    }else {
+                        if(directions[routeElt.id] === undefined)
+                            directions[routeElt.id] = [];
+
+                        directions[routeElt.id].push(routeElt.children[j].id);
+                    }
+
+                    count++;
+                }
             }
         }
 
         if(count == 0) {
-            alert("You must select at least one destination !")
+            alert("Vous devez sélectionner au moins une destination !")
             return;    
         }
 
-        lines = [];
-        count = 0;
-        for(var i = 0; i < document.getElementById("line-body").childElementCount; i++) {
-            var elt = document.getElementById("line-body").children[i];
-            if(elt.getAttribute("class").includes("dest-1")) {
-                lines.push(elt.id);
-                count++;
-            }
-        }
-
-        if(count == 0) {
-            alert("You must select at least one line !")
-            return;    
-        }
     }else {
-        if(directions == undefined || directions.length == 0 || lines == undefined || lines.length == 0) {
-            alert("You must select at least one line and one destination !")
+        if(getAllDirections() == undefined || getAllDirections().length == 0) {
+            alert("Vous devez sélectionner au moins une destination !")
             return;
         }
     }
@@ -541,7 +591,7 @@ function updateDirections(e) {
     clearAlert();
 
     //analytics endpoint
-    sendPost("/choose", {stop_name: stopName, direction: directions, line: lines}, (success, result) => {});
+    sendPost("/choose", {stop_name: stopName, directions: directions}, (success, result) => {});
 
     updateInfos();
     getAlert();
@@ -585,53 +635,71 @@ function clearAlert() {
     displayAlert = false;
 }
 
+function loadClientInfos(callBack) {
+    sendGet("/clientinfos", (success, result) => {
+        if(Object.keys(result).length == 0) {
+            console.error("Error [2]");
+            return;
+        }
+        transportName = result.transport_name;
+        stationName = result.station_name;
+
+        document.getElementById("transport-type-1").innerText = transportName;
+        document.getElementById("transport-type-2").innerText = transportName;
+
+        callBack();
+    });
+}
+
 function load(type, callBack) {
     if(type == 2)
         return;
 
-    sendGet("/stops", (success, res) => {
-        if(res == null || res.length <= 0) {
-            console.log("Error [1]");
-            return
-        }
-
-        document.getElementById("stop-names").innerHTML = "";
-
-        var favs = localStorage.getItem("favorites");
-        if(favs != null) {
-            favs = JSON.parse(favs);
-            var ok = false;
-
-            for(var i = 0; i < favs.length; i++) {
-                if(favs[i] == "")
-                    continue;
+    loadClientInfos(() => {
+        sendGet("/stops", (success, res) => {
+            if(res == null || res.length <= 0) {
+                console.log("Error [1]");
+                return
+            }
+    
+            document.getElementById("stop-names").innerHTML = "";
+    
+            var favs = localStorage.getItem("favorites");
+            if(favs != null) {
+                favs = JSON.parse(favs);
+                var ok = false;
+    
+                for(var i = 0; i < favs.length; i++) {
+                    if(favs[i] == "")
+                        continue;
+                    var opt = document.createElement("option");
+                    opt.innerText = favs[i].toUpperCase();
+                    opt.value = favs[i];
+        
+                    document.getElementById("stop-names").appendChild(opt);
+                    ok = true;
+                }
+            }
+            
+            for(var i = 0; i < res.length; i++) {
                 var opt = document.createElement("option");
-                opt.innerText = favs[i].toUpperCase();
-                opt.value = favs[i];
+                if(favs !== null && favs.includes(res[i])) {
+                    opt.hidden = true;
+                }
+                    
+                opt.innerText = res[i];
+                opt.value = res[i];
     
                 document.getElementById("stop-names").appendChild(opt);
-                ok = true;
+                possibleStopNames.push(res[i]);
             }
-        }
-        
-        for(var i = 0; i < res.length; i++) {
-            var opt = document.createElement("option");
-            if(favs !== null && favs.includes(res[i])) {
-                opt.hidden = true;
+    
+            document.getElementById("stop-selection").placeholder = "Sélectionnez votre " + stationName;
+            document.getElementById("stop-selection").disabled = false;
+            if(callBack != undefined) {
+                callBack();
             }
-                
-            opt.innerText = res[i];
-            opt.value = res[i];
-
-            document.getElementById("stop-names").appendChild(opt);
-            possibleStopNames.push(res[i]);
-        }
-
-        document.getElementById("stop-selection").placeholder = "Sélectionnez votre station";
-        document.getElementById("stop-selection").disabled = false;
-        if(callBack != undefined) {
-            callBack();
-        }
+        });
     });
 }
 

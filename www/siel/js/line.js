@@ -55,7 +55,7 @@ function load() {
         FIRST_STOP_I = 0;
         THEORETICAL = result[0].theoretical;
         DIRECTION = result[result.length-1].station_name;
-        LINE = result[0].route_short_name;
+        LINE = result[0].route_id;
 
         result.forEach(element => {
             var stationElt = document.createElement("div");
@@ -100,7 +100,10 @@ function load() {
 
             nameElt.setAttribute("class", "station-name");
             a.innerText = element.station_name;
-            a.href = "index.html?stop_name=" + element.station_name + "&direction=" + DIRECTION + "&line=" + LINE + "&skip=true&highlight=" + TRIP_ID;
+            
+            let directions = {};
+            directions[LINE] = [DIRECTION];
+            a.href = "index.html?stop_name=" + element.station_name + "&directions=" + JSON.stringify(directions) + "&skip=true&highlight=" + TRIP_ID;
             nameElt.appendChild(a);
             stationElt.appendChild(nameElt);
             lineElt.appendChild(stationElt)

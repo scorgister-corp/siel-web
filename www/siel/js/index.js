@@ -1,7 +1,7 @@
 const urlParams = new URLSearchParams(window.location.search);
 var selectedStop = urlParams.get('stop_name');
-var selectedDirections = urlParams.get('direction');
-var selectedLines = urlParams.get('line');
+var selectedDirections = urlParams.get('directions');
+//var selectedLines = urlParams.get('line');
 var skip = urlParams.get('skip');
 var highlight = urlParams.get('highlight');
 
@@ -44,20 +44,8 @@ load(0, () => {
         }
 
         if(ok) {
-            if(selectedDirections !== null) {
-                selectedDirections = selectedDirections.split(",");
-                if(selectedDirections.length != 0) {
-                    directions = selectedDirections
-                }
-            }
-
-            if(selectedLines !== null) {
-                selectedLines = selectedLines.split(",");
-                if(selectedLines.length != 0) {
-                    lines = selectedLines;            
-                }
-            }
-
+            directions = JSON.parse(selectedDirections);
+                        
             document.getElementById("stop-selection").value = selectedStop;
 
             if(skip !== null && skip == "true") {
