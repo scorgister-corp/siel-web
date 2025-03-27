@@ -17,7 +17,9 @@ var freezAlert = false;
 var HIGHLIGHT_ID = undefined;
 var FIRST_LOAD = true;
 
-const AUDIO_URL = "/sound/";
+var ASSETS_URL = "/";
+
+const AUDIO_URL = "sound/";
 const AUDIO_FORMAT = ".mp3";
 
 var audioHistory = [];
@@ -343,7 +345,7 @@ function getInfos() {
             return;
 
         var gender = ["F", "M"][Math.floor((Math.random()*2))];
-        var audio = new Audio(AUDIO_URL + "D" + gender + destinationMin.toUpperCase() + "2" + AUDIO_FORMAT);
+        var audio = new Audio(ASSETS_URL + AUDIO_URL + "D" + gender + destinationMin.toUpperCase() + "2" + AUDIO_FORMAT);
         audio.onended = (e) => {
             if(next == undefined)
                 return;
@@ -353,7 +355,7 @@ function getInfos() {
                 return;
     
             
-            var audio = new Audio(AUDIO_URL + "N" + gender + diff.min + AUDIO_FORMAT);
+            var audio = new Audio(ASSETS_URL + AUDIO_URL + "N" + gender + diff.min + AUDIO_FORMAT);
             audio.play();
         }
         audio.play()
@@ -641,6 +643,9 @@ function loadClientInfos(callBack) {
             console.error("Error [2]");
             return;
         }
+
+        ASSETS_URL = result.assets_url;
+
         transportName = result.transport_name;
         stationName = result.station_name;
 
