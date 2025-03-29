@@ -66,7 +66,7 @@ function getAlert() {
         result.forEach(elt => {
             let text = "Ligne " + elt.routeId + ": " + elt.text;
             let duration = calcAlertDuration(text);
-            console.log(alerts[elt.alert_id]);
+
             if(alerts[elt.alert_id] == undefined) {
                 alerts[elt.alert_id] = {
                     text: text,
@@ -168,6 +168,9 @@ function getInfos() {
         var routeColors = {};
         result.forEach(element => {
             if(!routes.includes(element["route_short_name"])) {
+                if(element["route_short_name"] == undefined)
+                    return;
+
                 routes.push(element["route_short_name"]);
                 routeColors[element["route_short_name"]] = element.trip_color;
             }

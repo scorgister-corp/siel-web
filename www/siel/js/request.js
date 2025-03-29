@@ -1,11 +1,12 @@
-const API_HOST = "https://api.mtp.scorgister.net";
-//const API_HOST = "http://localhost:8000";
-//const API_HOST = "http://192.168.0.13:8000";
+
+function getAPIUrl() {
+    return window.sessionStorage.getItem("API_HOST");
+}
 
 function sendPost(url, body, response = function() {}) {
     let headers = {'Content-Type': 'application/json', 'X-Application-UID': getUID()};
 
-    fetch(API_HOST + url, {
+    fetch(getAPIUrl() + url, {
         method: 'POST',
         headers: headers,
         body: JSON.stringify(body)
@@ -16,7 +17,7 @@ function sendPost(url, body, response = function() {}) {
 function sendGet(url, response = function() {}) {
     let headers = {'X-Application-UID': getUID()};
 
-    fetch(API_HOST + url, {
+    fetch(getAPIUrl() + url, {
         method: 'GET',
         headers: headers
     }).then(response => response.json())

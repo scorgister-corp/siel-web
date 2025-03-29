@@ -114,3 +114,4 @@ class WWWHandler extends Handler {
 
 module.exports.start = start;
 module.exports.WWWHandler = WWWHandler;
+module.exports.Handler = Handler;

@@ -164,6 +164,11 @@ header {
     font-size: 50px;
 }
 
+#home-text {
+    color: yellow;
+    font-size: 50px;
+}
+
 .route-name {
     color: white;
 
@@ -447,6 +452,11 @@ header {
     #clock-text {
         font-size: 25px;
     }
+
+    #home-text {
+        font-size: 25px;
+    }
+
     .other-container {
         margin-left: 0px;
         margin-right: 0px;
@@ -480,6 +490,10 @@ header {
 
     #panel-body {
         font-size: 1em;
+    }
+
+    #marquee-rtl {
+        font-size: 40px;
     }
 
 }

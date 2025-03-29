@@ -1,7 +1,7 @@
 {
-    "name": "Montpellier SIEL",
+    "name": "SIEL",
     "shrot_name": "SIEL",
-    "start_url": "/siel/",
+    "start_url": "/",
     "background_color": "#ffffff",
     "theme_color": "#ffffff",
     "display": "fullscreen",

@@ -55,6 +55,10 @@ class Handler {
         this.send(res, undefined, 401, "text/plain");
     }
 
+    send400(res) {
+        this.send(res, undefined, 400, "text/plain");
+    }
+
     /**
      * 
      * @param {Request} req 

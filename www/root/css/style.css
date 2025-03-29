@@ -1,0 +1,103 @@
+@font-face {
+    font-family: "Parasine-Regular";
+    src: url("/font/Parisine.woff") format("woff"),
+    url("/font/Parisine.woff2") format("woff2"),
+    url("/font/Parisine.ttf") format("truetype");
+}
+
+body {
+    margin: 0px;
+    font-family: "Parasine-Regular";
+    background-color: black;
+    overflow-x: hidden;
+}
+
+#header {
+    text-align: center;
+    border-style: solid;
+    border-bottom-width: 15px;
+    border-top-width: 0px;
+    border-left-width: 0px;
+    border-right-width: 0px;
+    border-color: rgb(229, 102, 22);
+    background-color: white;
+}
+
+h1 {
+    margin-top: 0px;
+    padding-top: 40px;
+    font-size: 60px;
+
+}
+
+#main {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    margin: 10px;
+    background-color: black;
+}
+
+.card {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+
+    border: solid 2px white;
+    border-radius: 12px;
+
+    padding-top: 15px;
+    padding-bottom: 15px;
+
+    padding-left: 20px;
+    padding-right: 20px;
+
+    margin: 20px;
+    background-color: white;
+
+    box-shadow: 12px 12px rgb(229, 102, 22);
+    transition: 0.3s;
+}
+
+.card:hover {
+    box-shadow: 20px 20px rgb(229, 102, 22);
+
+}
+
+.card-title {
+    font-size: 40px;
+    margin-bottom: 10px;
+}
+
+.card-desc {
+    font-size: 20px;
+    margin-bottom: 30px;
+}
+
+.card-access-btn {
+    font-size: 20px;
+}
+
+@media (max-width: 1000px) {
+
+    h1 {
+        font-size: 30px;
+        margin-right: 10px;
+        margin-left: 10px;
+    }
+
+    body {
+        margin-left: 0px;
+        margin-right: 0px;
+    }
+
+    .card-title {
+        font-size: 30px;
+    }
+
+    .card-desc {
+        font-size: 20px;
+    }
+
+}

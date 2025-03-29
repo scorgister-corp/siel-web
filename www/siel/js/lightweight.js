@@ -1,7 +1,7 @@
 const urlParams = new URLSearchParams(window.location.search);
 stopName = urlParams.get('stop_name');
-const direction = urlParams.get('direction');
-const line = urlParams.get('line');
+const direction = urlParams.get('directions');
+const line = urlParams.get('lines');
 
 function updateInfosLightweight() {
     getInfos();
