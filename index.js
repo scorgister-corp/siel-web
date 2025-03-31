@@ -1,5 +1,11 @@
 const server = require('./server');
-const sessions = require('./session.json');
+const fs = require("fs");
+
+if(!fs.existsSync("./session.json")) {
+    fs.writeFileSync("./session.json", JSON.stringify([]));
+}
+
+const sessions = JSON.parse(fs.readFileSync("./session.json"));
 
 let paths = [];
 
