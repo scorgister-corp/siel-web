@@ -64,7 +64,7 @@ function getAlert() {
 
         let ids = [];
         result.forEach(elt => {
-            let text = "Ligne " + elt.routeId + ": " + elt.text;
+            let text = "Ligne " + elt.route_short_name + ": " + elt.text;
             let duration = calcAlertDuration(text);
 
             if(alerts[elt.alert_id] == undefined) {
@@ -89,21 +89,23 @@ function getAlert() {
     });
 }
 
-function updateAlert() {
+function updateAlert() {    
     if(alerts.length == 0 || displayAlertSchedule.length == 0) {
         return;
     }
     if(!displayAlert) {
         displayAlert = true;
-        setAlert(displayAlertSchedule.pop());
+        setAlert();
     }
 }
 
-function setAlert(id) {
+function setAlert() {
     let p = document.getElementById("marquee-rtl");
 
+    let id = displayAlertSchedule.shift();
+    
     while(alerts[id] === undefined && displayAlertSchedule.length > 0)
-        id = displayAlertSchedule.pop();
+        id = displayAlertSchedule.shift();
     
     if(alerts[id] != undefined)
         displayAlertSchedule.push(id);
@@ -126,8 +128,8 @@ function setAlert(id) {
         }
     );
 
-   animation.onfinish = e => {
-        setAlert(displayAlertSchedule.pop());
+    animation.onfinish = e => {
+        setAlert();
     }
 
     div.innerText = alert.text;    
@@ -135,6 +137,7 @@ function setAlert(id) {
     p.innerText = "";
     p.appendChild(div);
     animation.play();
+    displayAlert = true;
 }
 
 function updateStatusAlert(upt) {
@@ -401,12 +404,14 @@ function updateStation(stop_name, e) {
 }
 
 function showNonDesservie(stopName) {
+    directions = {};
     clear();
-
+    
     if(alerts[0] != undefined) {
         return;
     }
-
+    
+    clearAlert();
     let allRoute = getAllRoutes();
 
     let text = "La " + stationName + " " + stopName + " n'est actuellement pas desservie";
@@ -551,7 +556,7 @@ function onclickDest(e) {
     
 }
 
-function updateDirections(e) {
+function updateDirections(e) {    
     if(e != "true") {
         directions = {};
 
@@ -576,7 +581,7 @@ function updateDirections(e) {
                 }
             }
         }
-
+        
         if(count == 0) {
             alert("Vous devez sélectionner au moins une destination !")
             return;    
@@ -619,6 +624,9 @@ function clear() {
 
     document.getElementById("time-1-link").href = "#";
     document.getElementById("time-2-link").href = "#";
+
+    document.getElementById("panel-body").innerText = "";
+    document.getElementById("select-text").innerText = "";
 }
 
 function placeDefaultRouteName() {
@@ -633,11 +641,25 @@ function placeDefaultRouteName() {
 }
 
 function clearAlert() {
-    document.getElementById("marquee-rtl").innerText = "";
-    document.getElementById("marquee-rtl").hidden = true;
+    displayAlert = false;
+
+    let marquee = document.getElementById("marquee-rtl");
+    
+    if(marquee.firstElementChild != undefined) {
+        let animations = marquee.firstElementChild.getAnimations();
+        if(animations.length > 0) {
+            for (let i = 0; i < animations.length; i++) {
+                const anim = animations[i];
+                anim.onfinish = (e) => {};
+            }
+        }
+    }
+
+    marquee.innerText = "";
+    marquee.hidden = true;
+
     alerts = {};
     displayAlertSchedule = [];
-    displayAlert = false;
 }
 
 function loadClientInfos(callBack) {
