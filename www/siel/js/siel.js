@@ -217,7 +217,7 @@ function getInfos() {
         }
 
         var v1ID = result[0]["vehicle_id"];
-        document.getElementById("time-1").setAttribute("title", (v1ID==null?"no vehicle assigned":v1ID));
+        document.getElementById("time-1").setAttribute("title", (v1ID==null?"aucun véhicule attribué":v1ID));
         document.getElementById("time-1-link").setAttribute("href", "line.html?tripid=" + result[0]["trip_id"]);
         
         if(result.length > 1) {
@@ -306,7 +306,7 @@ function getInfos() {
 
                 try {
                     var vID = result[i]["vehicle_id"];
-                    mainDiv.setAttribute("title", (vID==null?"no vehicle assigned":vID));
+                    mainDiv.setAttribute("title", (vID==null?"aucun véhicule attribué":vID));
                 }catch(e) {
                     console.log(e);  
                 }
@@ -319,9 +319,9 @@ function getInfos() {
 
             var but = document.createElement("button");
             if(localStorage.getItem("favorites") == null || !JSON.parse(localStorage.favorites).includes(stopName))
-                but.innerText = "Add " + stopName + " as favorites";
+                but.innerText = "Ajouter " + stopName + " aux favoris";
             else
-                but.innerText = "Remove " + stopName + " of favorites";
+                but.innerText = "Supprimer " + stopName + " des favoris";
             but.value = stopName;
             but.onclick = favAction;
             but.setAttribute("class", "fav-btn")
@@ -752,7 +752,7 @@ function favAction(e) {
             if(favorites[i] == e.target.value) {
                 favorites.splice(i, 1);
                 localStorage.setItem("favorites", JSON.stringify(favorites));
-                e.target.innerText = "Add " + e.target.value + " as favorites";
+                e.target.innerText = "Ajouter " + e.target.value + " aux favoris";
 
                 for(let data of dataList.children) {
                     if(data.innerText == e.target.value.toUpperCase()) {
@@ -771,7 +771,7 @@ function favAction(e) {
     }
     
     localStorage.setItem("favorites", JSON.stringify(favorites));
-    e.target.innerText = "Remove " + e.target.value + " of favorites";
+    e.target.innerText = "Supprimer " + e.target.value + " des favoris";
 
     for(let data of dataList.children) {
         if(data.innerText.toUpperCase() == e.target.value.toUpperCase()) {

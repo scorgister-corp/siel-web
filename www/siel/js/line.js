@@ -119,12 +119,12 @@ function load() {
 function updateTimer() {
     let sec = NEXT_STOP - Math.floor(Date.now() / 1000)
     if(IN_STATION) {
-        document.getElementById("next-stop").innerText = "Stopped at " + NEXT_STOP_NAME + " (" + sec + " s)" + (THEORETICAL?"*":"");
+        document.getElementById("next-stop").innerText = "A quai: " + NEXT_STOP_NAME + " (" + sec + " s)" + (THEORETICAL?"*":"");
     }else {
         if(CURRENT_STOP_I == FIRST_STOP_I)
-            document.getElementById("next-stop").innerText = "Departure from " + NEXT_STOP_NAME + " (" + sec + " s)" + (THEORETICAL?"*":"");
+            document.getElementById("next-stop").innerText = "Départ: " + NEXT_STOP_NAME + " (" + sec + " s)" + (THEORETICAL?"*":"");
         else
-            document.getElementById("next-stop").innerText = "In transit to " + NEXT_STOP_NAME + " (" + sec + " s)" + (THEORETICAL?"*":"");
+            document.getElementById("next-stop").innerText = "Prochain arret: " + NEXT_STOP_NAME + " (" + sec + " s)" + (THEORETICAL?"*":"");
     }
 }
 
