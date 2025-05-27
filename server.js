@@ -52,7 +52,7 @@ class WWWHandler extends Handler {
         endPoint = decodeURI(endPoint);
             
         endPoint = endPoint.split("?")[0];
-    
+        
         try {
             this.sendFile(res, endPoint);
             return;
@@ -67,19 +67,17 @@ class WWWHandler extends Handler {
     }
 
     send404(res) {
-        try {
+        if(fs.existsSync("404.html")) {
             this.sendFile(res, "404.html", 404);
-        }catch(e) {
-            this.send(res, undefined, 500, "text/plain");
-
-        }
+        }else
+            super.send404(res);
     }
 
     send401(res) {
-        try {
+        if(fs.existsSync("401.html")) {
             this.sendFile(res, "401.html", 401);
-        }catch(e) {
-            this.send(res, undefined, 500, "text/plain");
+        }else {
+            super.send401(res);
         }
     }
 
@@ -105,7 +103,7 @@ class WWWHandler extends Handler {
             }
 
             this.send(res, bufferFile, statusCode, mimeType, true);
-        }catch(e) {
+        }catch(e) {            
             this.send404(res);
         }
     }

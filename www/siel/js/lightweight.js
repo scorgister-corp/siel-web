@@ -1,26 +1,22 @@
 const urlParams = new URLSearchParams(window.location.search);
 stopName = urlParams.get('stop_name');
-const direction = urlParams.get('directions');
-const line = urlParams.get('lines');
+const directionsRaw = urlParams.get('directions');
+//const line = urlParams.get('lines');
 
 function updateInfosLightweight() {
     getInfos();
 }
 
-if (stopName === null || direction === null || line === null) {
-    alert("No stop name, direction or line provided");
-}else {
-    lines = line.split(",");
-    directions = direction.split(",");
-    
-    if(lines.length == 0 || directions.length == 0) {
-        alert("No stop name, direction or line provided");
-
+loadClientInfos(() => {
+    if (stopName === null || directions === null) {
+        alert("No stop name, directions provided");
     }else {
+        //lines = line.split(",");
+        directions = JSON.parse(directionsRaw);
+        
         load(2);
-    
+
         updateInfosLightweight();
         setInterval(updateInfosLightweight, 10000);
     }
-}
-
+});

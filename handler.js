@@ -64,7 +64,7 @@ class Handler {
      * @param {Request} req 
      * @param {Response} res 
      */
-    doGet(req, res) {
+    doGet(req, res) {        
        this.send405(res);
     }
 
@@ -86,6 +86,7 @@ class Handler {
      */
     send(res, message, statusCode = 200, contentType = "application/json", isWeb = false) {
         res.statusCode = statusCode;
+
         res.setHeader("Content-Type", contentType);
         res.setHeader("X-Robots-Tag", "noindex, nofollow");
         

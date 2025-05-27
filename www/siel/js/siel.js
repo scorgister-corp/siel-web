@@ -674,9 +674,11 @@ function loadClientInfos(callBack) {
         transportName = result.transport_name;
         stationName = result.station_name;
 
-        document.getElementById("transport-type-1").innerText = transportName;
-        document.getElementById("transport-type-2").innerText = transportName;
-
+        if(document.getElementById("transport-type-1") != undefined && document.getElementById("transport-type-2") != undefined) {
+            document.getElementById("transport-type-1").innerText = transportName;
+            document.getElementById("transport-type-2").innerText = transportName;
+        }
+       
         callBack();
     });
 }
