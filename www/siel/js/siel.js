@@ -218,7 +218,7 @@ function getInfos() {
 
         var v1ID = result[0]["vehicle_id"];
         document.getElementById("time-1").setAttribute("title", (v1ID==null?"aucun véhicule attribué":v1ID));
-        document.getElementById("time-1-link").setAttribute("href", "line.html?tripid=" + result[0]["trip_id"]);
+        document.getElementById("time-1-link").setAttribute("href", "line.html?api=" + window.sessionStorage.getItem("API_HOST") + "&tripid=" + result[0]["trip_id"]);
         
         if(result.length > 1) {
             var destinationMax = result[1]["trip_headsign"];
@@ -237,7 +237,7 @@ function getInfos() {
 
             var v2ID = result[1]["vehicle_id"];
             document.getElementById("time-2").setAttribute("title", (v2ID==null?"no vehicle assigned":v2ID));
-            document.getElementById("time-2-link").setAttribute("href", "line.html?tripid=" + result[1]["trip_id"]);
+            document.getElementById("time-2-link").setAttribute("href", "line.html?api=" + window.sessionStorage.getItem("API_HOST") + "&tripid=" + result[1]["trip_id"]);
 
             if(HIGHLIGHT_ID != undefined && result[1].trip_id == HIGHLIGHT_ID) {
                 document.getElementById("time-max").setAttribute("class", "time-number highlight");
