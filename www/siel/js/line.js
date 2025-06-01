@@ -12,6 +12,11 @@ var LINE = undefined;
 var THEORETICAL = false;
 
 var TRIP_ID = urlParams.get("tripid");
+const apiHost = urlParams.get("api");
+
+if(apiHost != undefined) {
+    window.sessionStorage.setItem("API_HOST", apiHost);
+}
 
 function load() {
     if(TRIP_ID == null || TRIP_ID == "") {
@@ -35,7 +40,7 @@ function load() {
 
             document.getElementById("line-id").innerText = result[0]["station_name"] + " - " + result[result.length-1]["station_name"];
             document.getElementById("vehicle-id").innerText = result[0]["vehicle_id"];
-            document.getElementById("vehicle-id-link").setAttribute("href", "info.html?vehiculeid=" + result[0]["vehicle_id"]);
+            document.getElementById("vehicle-id-link").setAttribute("href", "info.html?api=" + window.sessionStorage.getItem("API_HOST") + "&vehiculeid=" + result[0]["vehicle_id"]);
             
             if(result[0].trip_color) {
                 lineElt.setAttribute("style", lineElt.getAttribute("style") + "background-color: #" + result[0].trip_color + ";");

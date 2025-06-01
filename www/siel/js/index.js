@@ -5,6 +5,7 @@ startSession = () => {
     //var selectedLines = urlParams.get('line');
     var skip = urlParams.get('skip');
     var highlight = urlParams.get('highlight');
+    
 
     var clockMouseEnter = false;
 

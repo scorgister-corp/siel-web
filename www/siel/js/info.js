@@ -1,4 +1,9 @@
 const urlParams = new URLSearchParams(window.location.search);
+const apiHost = urlParams.get("api");
+
+if(apiHost != undefined) {
+    window.sessionStorage.setItem("API_HOST", apiHost);
+}
 
 var TRIP_ID = undefined;
 
@@ -74,7 +79,7 @@ function updateTrip() {
         span.setAttribute("class", "trip-data");
         title.innerText = result[0].station_name + " - " + result[result.length-1].station_name;
 
-        a.href = "line.html?tripid=" + TRIP_ID;
+        a.href = "line.html?api=" + window.sessionStorage.getItem("API_HOST") + "&tripid=" + TRIP_ID;
 
         var th = document.createElement("span");
         var td = document.createElement("span");

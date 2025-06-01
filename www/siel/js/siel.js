@@ -258,7 +258,7 @@ function getInfos() {
 
             for(var i = 2; i < result.length; i++) {
                 var mainA = document.createElement("a");
-                mainA.setAttribute("href", "line.html?tripid=" + result[i]["trip_id"]);
+                mainA.setAttribute("href", "line.html?api=" + window.sessionStorage.getItem("API_HOST") + "&tripid=" + result[i]["trip_id"]);
 
                 var mainDiv = document.createElement("div");
                 mainDiv.setAttribute("class", "other-container");
