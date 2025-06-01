@@ -1,7 +1,12 @@
 const urlParams = new URLSearchParams(window.location.search);
 stopName = urlParams.get('stop_name');
 const directionsRaw = urlParams.get('directions');
+const apiHost = urlParams.get("api");
 //const line = urlParams.get('lines');
+
+if(apiHost != undefined) {
+    window.sessionStorage.setItem("API_HOST", apiHost);
+}
 
 function updateInfosLightweight() {
     getInfos();
