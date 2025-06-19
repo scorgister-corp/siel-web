@@ -198,7 +198,11 @@ function getInfos() {
             }
         }
         document.getElementById("dest-min").innerText = destinationMin + (getAllRoutes().length>1?(" (" + nameMin + ")"):"");
-        
+        if(result[0].modified)
+            document.getElementById("dest-min").classList.add("modified");
+        else 
+            document.getElementById("dest-min").setAttribute("class", "");
+
         var timeMin = result[0]["departure_time"] + "000";
         var timeMax = undefined;
 
@@ -225,7 +229,11 @@ function getInfos() {
             var nameMax = result[1]["route_short_name"];
             
             document.getElementById("dest-max").innerText = destinationMax + (getAllRoutes().length>1?(" (" + nameMax + ")"):"");
-            
+            if(result[1].modified)
+                document.getElementById("dest-max").classList.add("modified");
+            else 
+                document.getElementById("dest-max").setAttribute("class", "");
+
             timeMax = result[1]["departure_time"] + "000";
             var tMax = new Date(Number(timeMax));
 
@@ -275,9 +283,13 @@ function getInfos() {
 
                 var destinationSpan = document.createElement("span");
                 destinationSpan.innerText = result[i]["trip_headsign"];
+                if(result[i].modified)
+                   destinationSpan.classList.add("modified");
+                else
+                    destinationSpan.setAttribute("class", "");
 
                 if(FIRST_LOAD && HIGHLIGHT_ID != undefined && result[i].trip_id == HIGHLIGHT_ID) {
-                    destinationSpan.setAttribute("class", "highlight");
+                    mainDiv.classList.add("highlight")
                 }
 
                 numSpan.appendChild(e);
@@ -728,6 +740,7 @@ function load(type, callBack) {
     
             document.getElementById("stop-selection").placeholder = "Sélectionnez votre " + stationName;
             document.getElementById("stop-selection").disabled = false;
+
             if(callBack != undefined) {
                 callBack();
             }

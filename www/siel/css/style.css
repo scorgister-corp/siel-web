@@ -277,6 +277,10 @@ header {
     display: inline;
 }
 
+.modified {
+    color: var(--alert-color);
+}
+
 .flex {
     display: flex;
     justify-content: space-between;
