@@ -201,7 +201,7 @@ function getInfos() {
         if(result[0].modified)
             document.getElementById("dest-min").classList.add("modified");
         else 
-            document.getElementById("dest-min").setAttribute("class", "");
+            document.getElementById("dest-min").classList.remove("modified");
 
         var timeMin = result[0]["departure_time"] + "000";
         var timeMax = undefined;
@@ -232,7 +232,7 @@ function getInfos() {
             if(result[1].modified)
                 document.getElementById("dest-max").classList.add("modified");
             else 
-                document.getElementById("dest-max").setAttribute("class", "");
+                document.getElementById("dest-max").classList.remove("modified");
 
             timeMax = result[1]["departure_time"] + "000";
             var tMax = new Date(Number(timeMax));
@@ -286,7 +286,7 @@ function getInfos() {
                 if(result[i].modified)
                    destinationSpan.classList.add("modified");
                 else
-                    destinationSpan.setAttribute("class", "");
+                    destinationSpan.classList.remove("modified");
 
                 if(FIRST_LOAD && HIGHLIGHT_ID != undefined && result[i].trip_id == HIGHLIGHT_ID) {
                     mainDiv.classList.add("highlight")
